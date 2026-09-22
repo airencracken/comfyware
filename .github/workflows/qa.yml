@@ -20,5 +20,9 @@ jobs:
           while IFS= read -r -d '' ebuild; do
             bash -n "$ebuild" || exit 1
           done < <(git ls-files -z '*.ebuild')
+      - name: Check dependency bundle tooling
+        run: |
+          bash -n scripts/make-deps.sh scripts/test-make-deps.sh || exit 1
+          bash scripts/test-make-deps.sh || exit 1
       - name: Check Gentoo packaging
         uses: pkgcore/pkgcheck-action@8491e92faa1010d5c6947c114d23215e5a74684e # v1

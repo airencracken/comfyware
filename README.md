@@ -5,15 +5,15 @@ A Gentoo overlay for familyware, cozyware, friendware: software for your tribe.
 Built for dozens or hundreds of people who know why they're there, not millions
 of strangers who don't.
 
-| Package | What it does |
-| --- | --- |
-| `app-admin/imvault` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| Package | Release | What it does |
+| --- | --- | --- |
+| `app-admin/imvault` | `0.5.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/witmoot` | `0.1.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
-Both currently have **live `9999` ebuilds** that build the upstream `master`
-branch. Go dependencies are fetched during unpack; compilation uses the local
-module cache. Go 1.26 or newer is required and pulled in by Portage.
-Release-version ebuilds and automatic release updates are future work.
+Release ebuilds build the published source archives with checksummed Go dependency
+bundles; compilation does not need network access. Both also have **live `9999`
+ebuilds** that build upstream `master` and fetch dependencies during unpack.
+Go 1.26 or newer is required and pulled in by Portage.
 
 ## Add the overlay
 
@@ -41,23 +41,22 @@ Then run `emaint sync -r comfyware`.
 
 ## Install
 
-Live ebuilds require an explicit keyword opt-in. Add the following to
+The packages currently use testing keywords for amd64 and arm64. Add the following to
 `/etc/portage/package.accept_keywords/comfyware` (create the parent directory
 if your configuration uses directories):
 
 ```text
-app-admin/imvault::comfyware **
-www-apps/witmoot::comfyware **
+app-admin/imvault::comfyware ~*
+www-apps/witmoot::comfyware ~*
 acct-user/imvault::comfyware ~*
 acct-group/imvault::comfyware ~*
 acct-user/witmoot::comfyware ~*
 acct-group/witmoot::comfyware ~*
 ```
 
-The account packages are keyworded for amd64 and arm64. Keep the lines for the
-applications you install. `**` opts into unkeyworded live packages; `~*` accepts
-the account packages' testing keywords. Review any additional keyword or
-license changes Portage requests for dependencies.
+Keep the lines for the applications you install. `~*` accepts their testing
+keywords while leaving unkeyworded live builds disabled. Review any additional
+keyword or license changes Portage requests for dependencies.
 
 For video thumbnails and duration checks, add this to
 `/etc/portage/package.use/comfyware`:
@@ -96,17 +95,31 @@ Ensure logrotate runs regularly for OpenRC logs; systemd services use the journa
 
 ## Update
 
-Back up application data before upgrades. Sync the overlay and explicitly
-rebuild the live packages when you want current upstream code:
+Back up application data before upgrades. Sync the overlay and update the
+installed packages:
 
 ```sh
 emaint sync -r comfyware
-emerge --ask --oneshot app-admin/imvault::comfyware www-apps/witmoot::comfyware
+emerge --ask --update app-admin/imvault::comfyware www-apps/witmoot::comfyware
 ```
 
 Review protected configuration changes with `dispatch-conf` or `etc-update`,
-then restart the affected service. A live package's version stays `9999` when
-upstream changes, so a normal version-based world update may not rebuild it.
+then restart the affected service.
+
+### Opt into live builds
+
+To follow upstream `master`, additionally accept the exact live versions:
+
+```text
+=app-admin/imvault-9999::comfyware **
+=www-apps/witmoot-9999::comfyware **
+```
+
+Then explicitly rebuild with `emerge --ask --oneshot =app-admin/imvault-9999::comfyware`
+or `=www-apps/witmoot-9999::comfyware`. The version stays `9999` when upstream changes,
+so a normal version-based world update may not rebuild it. Remove these keyword
+entries to return to released versions. If you previously used an unversioned
+`**` entry for these applications, replace it with the release entries above.
 
 If migrating from a hand-made overlay, remove its duplicate recipes after
 switching to `::comfyware`. Keep your existing configuration and data, and
@@ -115,8 +128,9 @@ binary under `/usr/local/bin`.
 
 ## Maintain
 
-Run `pkgcheck scan --exit error` from this checkout. GitHub Actions also checks
-ebuild syntax and runs pkgcheck on pushes and pull requests. Enable the `test`
+Run `pkgcheck scan --exit error` and `bash scripts/test-make-deps.sh` from this
+checkout. GitHub Actions also checks ebuild syntax, dependency-bundle failure
+handling, and pkgcheck on pushes and pull requests. Enable the `test`
 USE flag for Witmoot's upstream Go tests; imvault also provides `src_test` for
 Portage's `FEATURES=test`. Full emerge and service checks belong in a disposable
 Gentoo installation, since account packages create real users and groups.
@@ -124,6 +138,19 @@ Gentoo installation, since account packages create real users and groups.
 The initial recipes come from each project's `contrib/gentoo` directory.
 This repository is the installable overlay; review service and dependency
 changes upstream when updating its recipes.
+
+For a new version, download and verify the upstream source release, then create
+its dependency bundle, for example:
+
+```sh
+bash scripts/make-deps.sh imvault 0.5.0 imvault_0.5.0_source.tar.gz /tmp/comfyware-distfiles
+```
+
+The helper verifies modules and refuses to overwrite an existing bundle. Publish
+the bundle under the matching `imvault-0.5.0` or `witmoot-0.1.0` tag in this
+repository's GitHub Releases. Update the release ebuild and generate its Manifest
+with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
+and tests with Portage before publishing. Keep existing distfiles immutable.
 
 Packaging is licensed under **AGPL-3.0-or-later**; see [LICENSE](LICENSE).
 Each application's ebuild records its own and its linked dependencies' licenses.
