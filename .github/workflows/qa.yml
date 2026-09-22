@@ -1,0 +1,24 @@
+name: Gentoo QA
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Check ebuild syntax
+        run: |
+          while IFS= read -r -d '' ebuild; do
+            bash -n "$ebuild" || exit 1
+          done < <(git ls-files -z '*.ebuild')
+      - name: Check Gentoo packaging
+        uses: pkgcore/pkgcheck-action@8491e92faa1010d5c6947c114d23215e5a74684e # v1
