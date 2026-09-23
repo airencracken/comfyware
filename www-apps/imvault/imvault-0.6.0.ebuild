@@ -51,6 +51,9 @@ src_test() {
 src_install() {
 	dobin imvault
 	einstalldocs
+	dodoc -r docs
+	docinto examples
+	dodoc -r contrib/caddy contrib/nginx contrib/apache
 
 	# The database and the uploaded bytes live here.
 	keepdir /var/lib/imvault

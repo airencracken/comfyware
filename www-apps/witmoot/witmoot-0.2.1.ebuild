@@ -51,6 +51,8 @@ src_install() {
 	dobin witmoot
 	einstalldocs
 	dodoc -r docs
+	docinto examples
+	dodoc -r contrib/caddy contrib/nginx contrib/apache
 
 	keepdir /var/lib/witmoot
 	fowners witmoot:witmoot /var/lib/witmoot
