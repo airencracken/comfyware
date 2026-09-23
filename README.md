@@ -7,8 +7,8 @@ of strangers who don't.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.6.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.2.1` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/imvault` | `0.7.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/witmoot` | `0.3.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. Both also have **live `9999`
@@ -103,10 +103,24 @@ are supported too; both applications install examples for all three under
 - [imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/master/docs/deployment.md)
 - [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/master/docs/deployment.md)
 
+Run `imvault --help` or `witmoot --help` for commands, environment settings,
+and service paths. Generate a site configuration for your hostname with:
+
+```sh
+imvault proxy-config caddy --domain img.example.com > imvault.Caddyfile
+witmoot proxy-config caddy --domain board.example.org > witmoot.Caddyfile
+```
+
+Substitute `nginx` or `apache` for either helper. These commands print a config
+and the matching application settings; follow the proxy guide to install it.
+
 For OpenRC, enable your configured service with `rc-update add imvault default`
 and start it with `rc-service imvault start`; substitute `witmoot` for the board.
 For systemd, use `systemctl enable --now imvault` or `witmoot`.
-Ensure logrotate runs regularly for OpenRC logs; systemd services use the journal.
+OpenRC logs go to `/var/log/imvault.log` and `/var/log/witmoot.log`. The ebuilds
+depend on `app-admin/logrotate` and install each rule in `/etc/logrotate.d/`.
+Keep logrotate's cron job or timer enabled. Both systemd units explicitly send
+stdout and stderr to journald, which handles rotation and retention.
 
 ## Update
 
@@ -154,7 +168,10 @@ binary under `/usr/local/bin`.
 
 Run `pkgcheck scan --exit error` and `bash scripts/test-make-deps.sh` from this
 checkout. GitHub Actions also checks ebuild syntax, dependency-bundle failure
-handling, and pkgcheck on pushes and pull requests. Enable the `test`
+handling, staged service/logging installation against verified release sources,
+and pkgcheck on pushes and pull requests. The install check can run locally with
+`bash scripts/test-install.sh EBUILD SOURCE_DIRECTORY`; it uses an unprivileged
+staging directory and leaves account ownership checks to Portage. Enable the `test`
 USE flag for Witmoot's upstream Go tests; imvault also provides `src_test` for
 Portage's `FEATURES=test`. Full emerge and service checks belong in a disposable
 Gentoo installation, since account packages create real users and groups.
@@ -167,11 +184,11 @@ For a new version, download and verify the upstream source release, then create
 its dependency bundle, for example:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.5.0 imvault_0.5.0_source.tar.gz /tmp/comfyware-distfiles
+bash scripts/make-deps.sh imvault 0.7.0 imvault_0.7.0_source.tar.gz /tmp/comfyware-distfiles
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle. Publish
-the bundle under the matching `imvault-0.5.0` or `witmoot-0.2.0` tag in this
+the bundle under the matching `imvault-0.7.0` or `witmoot-0.3.0` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.

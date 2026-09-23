@@ -26,3 +26,26 @@ jobs:
           bash scripts/test-make-deps.sh || exit 1
       - name: Check Gentoo packaging
         uses: pkgcore/pkgcheck-action@8491e92faa1010d5c6947c114d23215e5a74684e # v1
+      - name: Check service and logging installation
+        run: |
+          bash -n scripts/test-install.sh || exit 1
+          work=$(mktemp -d) || exit 1
+          trap 'rm -rf "$work"' EXIT
+          for app in imvault witmoot; do
+            for ebuild in www-apps/"$app"/"$app"-*.ebuild; do
+              version=${ebuild##*/}
+              version=${version#"$app"-}
+              version=${version%.ebuild}
+              [ "$version" != 9999 ] || continue
+              source_dir="$work/$app-$version"
+              mkdir "$source_dir" || exit 1
+              release="https://github.com/airencracken/$app/releases/download/v$version"
+              source="${app}_${version}_source.tar.gz"
+              curl -fsSL "$release/$source" -o "$source_dir/$source" || exit 1
+              curl -fsSL "$release/${app}_${version}_checksums.txt" -o "$source_dir/checksums" || exit 1
+              (cd "$source_dir" && sha256sum --ignore-missing -c checksums) || exit 1
+              tar -xzf "$source_dir/$source" -C "$source_dir" --strip-components=1 || exit 1
+              bash scripts/test-install.sh "$ebuild" "$source_dir" || exit 1
+              bash scripts/test-install.sh "www-apps/$app/$app-9999.ebuild" "$source_dir" || exit 1
+            done
+          done
