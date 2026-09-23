@@ -7,8 +7,8 @@ of strangers who don't.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.5.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.2.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/imvault` | `0.6.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/witmoot` | `0.2.1` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. Both also have **live `9999`
@@ -94,7 +94,8 @@ configuration; Witmoot's native service defaults to `127.0.0.1:8082`.
 Use `/usr/bin/imvault` or `/usr/bin/witmoot` in the provisioning commands.
 
 Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
-are supported too; both applications include examples for all three:
+are supported too; both applications install examples for all three under
+`/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
 - [imvault proxy setup](https://github.com/airencracken/imvault/blob/master/docs/reverse-proxies.md)
 - [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/master/docs/reverse-proxies.md)
