@@ -8,7 +8,7 @@ of strangers who don't.
 | Package | Release | What it does |
 | --- | --- | --- |
 | `app-admin/imvault` | `0.5.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.1.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/witmoot` | `0.2.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. Both also have **live `9999`
@@ -147,7 +147,7 @@ bash scripts/make-deps.sh imvault 0.5.0 imvault_0.5.0_source.tar.gz /tmp/comfywa
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle. Publish
-the bundle under the matching `imvault-0.5.0` or `witmoot-0.1.0` tag in this
+the bundle under the matching `imvault-0.5.0` or `witmoot-0.2.0` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
