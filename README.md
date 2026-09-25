@@ -8,7 +8,7 @@ of strangers who don't.
 | Package | Release | What it does |
 | --- | --- | --- |
 | `www-apps/imvault` | `0.9.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.6.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/witmoot` | `0.7.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. Both also have **live `9999`
