@@ -24,6 +24,9 @@ tar -czf "$work/source.tar.gz" -C "$work" source || exit 1
 printf 'existing published bytes\n' > "$work/output/imvault-0.5.0-deps.tar.xz" || exit 1
 expect_failure 'Refusing to overwrite' imvault 0.5.0 "$work/source.tar.gz" "$work/output"
 grep -qx 'existing published bytes' "$work/output/imvault-0.5.0-deps.tar.xz" || fail 'An existing bundle changed.'
+ln -s "$work/missing" "$work/output/imvault-0.6.0-deps.tar.xz" || exit 1
+expect_failure 'Refusing to overwrite' imvault 0.6.0 "$work/source.tar.gz" "$work/output"
+[[ -L $work/output/imvault-0.6.0-deps.tar.xz ]] || fail 'An existing symlink changed.'
 # A failed Go download must never produce an archive that looks publishable.
 cat > "$work/bin/go" <<'EOF'
 #!/bin/sh

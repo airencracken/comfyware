@@ -62,6 +62,7 @@ src_install() {
 
 	newinitd contrib/openrc/imvault imvault
 	newconfd contrib/openrc/imvault.confd imvault
+	fperms 0600 /etc/conf.d/imvault
 	insinto /etc/logrotate.d
 	newins contrib/logrotate/imvault imvault
 

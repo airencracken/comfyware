@@ -45,6 +45,7 @@ src_install || fail "$PF src_install failed."
 cmp contrib/logrotate/"$PN" "$ED/etc/logrotate.d/$PN" || fail 'Packaged logrotate rule is missing or altered.'
 [[ $(stat -c %a "$ED/etc/logrotate.d/$PN") == 644 ]] || fail 'Logrotate rule is not mode 0644.'
 [[ -x $ED/etc/init.d/$PN && -s $ED/etc/conf.d/$PN ]] || fail 'OpenRC service or settings are missing.'
+[[ $(stat -c %a "$ED/etc/conf.d/$PN") == 600 ]] || fail "OpenRC configuration must be mode 0600 to protect credentials."
 [[ -x $ED/usr/bin/$PN ]] || fail 'Executable is missing from /usr/bin.'
 [[ -s $ED/etc/$PN/$PN.env ]] || fail 'systemd environment file is missing.'
 unit="$ED/usr/lib/systemd/system/$PN.service"
