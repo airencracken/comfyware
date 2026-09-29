@@ -1,22 +1,23 @@
 # Copyright 2026 Marcus J. Hildum
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Live ebuild for the master branch.
 
 EAPI=8
 
-inherit git-r3 go-module systemd
+inherit go-module systemd
 
 DESCRIPTION="A small, self-hosted bulletin board for friends and family"
 HOMEPAGE="https://github.com/airencracken/witmoot"
-EGIT_REPO_URI="https://github.com/airencracken/witmoot.git"
-EGIT_BRANCH="master"
+SRC_URI="
+	https://github.com/airencracken/witmoot/releases/download/v${PV}/${PN}_${PV}_source.tar.gz
+	https://github.com/airencracken/comfyware/releases/download/${P}/${P}-deps.tar.xz
+"
+S="${WORKDIR}/${PN}_${PV}_source"
 
 # Witmoot uses AGPL-3.0-or-later. The remaining entries cover the linked
 # Go dependencies, their bundled code, and the embedded HTMX asset.
 LICENSE="AGPL-3+ 0BSD BSD BSD-2 MIT public-domain"
 SLOT="0"
-KEYWORDS=""
-PROPERTIES="live"
+KEYWORDS="~amd64 ~arm64"
 IUSE="test"
 RESTRICT="!test? ( test )"
 DOCS=( LICENSE README.md THIRD_PARTY.md )
@@ -33,11 +34,6 @@ BDEPEND+="
 	acct-user/witmoot
 	test? ( app-admin/logrotate )
 "
-
-src_unpack() {
-	git-r3_src_unpack
-	go-module_live_vendor
-}
 
 src_configure() {
 	go-module_src_configure
