@@ -3,6 +3,7 @@
 
 from pathlib import Path
 import re
+import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +29,14 @@ def validate_manifest(lines, expected):
 
 
 class ManifestTests(unittest.TestCase):
+    def test_tracked_directories_are_categories_or_repository_infrastructure(self):
+        allowed = {"metadata", "profiles", "scripts"}
+        allowed.update(path.parent.parent.name for path in ROOT.glob("*/*/metadata.xml"))
+        paths = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
+        directories = {path.split("/", 1)[0] for path in paths if "/" in path and not path.startswith(".")}
+        self.assertEqual(directories - allowed, set(),
+                         "A root directory would be treated as an unknown package category")
+
     def test_release_recipes_have_exact_distfiles(self):
         for app in ("imvault", "witmoot"):
             with self.subTest(app=app):
