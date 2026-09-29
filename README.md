@@ -200,3 +200,7 @@ and tests with Portage before publishing. Keep existing distfiles immutable.
 
 Packaging is licensed under **AGPL-3.0-or-later**; see [LICENSE](LICENSE).
 Each application's ebuild records its own and its linked dependencies' licenses.
+
+To check the funding links GitHub recognizes and the public repository sidebars,
+run `python3 scripts/test-github-funding.py --live` with an authenticated `gh`.
+Both a funding file and an enabled Sponsorships setting are required.
