@@ -2,6 +2,7 @@
 """Check funding configuration and, with --live, GitHub's public sidebars."""
 
 import json
+from html.parser import HTMLParser
 import subprocess
 import sys
 import unittest
@@ -12,6 +13,27 @@ SUPPORT_URL = "https://ko-fi.com/airencracken"
 LIVE = "--live" in sys.argv
 if LIVE:
     sys.argv.remove("--live")
+
+
+class Headings(HTMLParser):
+    def __init__(self, html):
+        super().__init__()
+        self.current = None
+        self.headings = []
+        self.feed(html)
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "h2":
+            self.current = []
+
+    def handle_data(self, text):
+        if self.current is not None:
+            self.current.append(text)
+
+    def handle_endtag(self, tag):
+        if tag == "h2" and self.current is not None:
+            self.headings.append("".join(self.current).strip())
+            self.current = None
 
 
 def funding_errors(repositories):
@@ -33,6 +55,12 @@ def funding_errors(repositories):
 
 
 class FundingContractTests(unittest.TestCase):
+    def test_serialized_text_cannot_impersonate_a_sidebar_heading(self):
+        self.assertIn("Sponsor this project", Headings('<h2><span>Sponsor this project</span></h2>').headings)
+        for html in ('<script>{"text":"Sponsor this project"}</script>',
+                     '<p>Sponsor this project</p>', '<h2>About</h2>'):
+            self.assertNotIn("Sponsor this project", Headings(html).headings)
+
     def fixture(self):
         return {name: {"hasSponsorshipsEnabled": True,
                        "fundingLinks": [{"platform": "KO_FI", "url": SUPPORT_URL}]}
@@ -75,15 +103,17 @@ class LiveFundingTests(unittest.TestCase):
         self.assertFalse(payload.get("errors"), payload.get("errors"))
         self.assertEqual(funding_errors(payload["data"]), [])
 
-    def test_public_sidebars_display_the_sponsor_section(self):
+    def test_public_pages_include_the_sponsor_sidebar_heading(self):
         for name in REPOSITORIES:
             with self.subTest(repository=name):
                 request = urllib.request.Request(f"https://github.com/airencracken/{name}",
                                                  headers={"User-Agent": "comfyware-funding-check"})
                 with urllib.request.urlopen(request, timeout=20) as response:
                     html = response.read().decode()
-                self.assertTrue("Sponsor this project" in html, f"{name}: sponsor sidebar missing")
-                self.assertTrue(SUPPORT_URL in html, f"{name}: Ko-fi destination missing")
+                self.assertIn("Sponsor this project", Headings(html).headings,
+                              f"{name}: sponsor sidebar missing")
+                # GitHub hydrates its funding links in the browser. Their
+                # destination is checked through fundingLinks above.
 
 
 if __name__ == "__main__":
