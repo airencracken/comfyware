@@ -25,6 +25,7 @@ IUSE="ffmpeg"
 # cannot be enforced.
 RDEPEND="
 	app-admin/logrotate
+	app-misc/ca-certificates
 	acct-group/imvault
 	acct-user/imvault
 	ffmpeg? ( media-video/ffmpeg )

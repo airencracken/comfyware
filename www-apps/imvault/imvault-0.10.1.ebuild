@@ -1,24 +1,22 @@
 # Copyright 2026 Marcus J. Hildum
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Live ebuild for the master branch.
 
 EAPI=8
 
-inherit git-r3 go-module systemd
+inherit go-module systemd
 
 DESCRIPTION="Self-hosted photo and short clip library for friends and family"
 HOMEPAGE="https://github.com/airencracken/imvault"
-EGIT_REPO_URI="https://github.com/airencracken/imvault.git"
-# The project's default branch is master rather than main.
-EGIT_BRANCH="master"
+SRC_URI="
+	https://github.com/airencracken/imvault/releases/download/v${PV}/${PN}_${PV}_source.tar.gz
+	https://github.com/airencracken/comfyware/releases/download/${P}/${P}-deps.tar.xz
+"
+S="${WORKDIR}/${PN}_${PV}_source"
 
 # Include the linked Go dependencies, bundled libc/SQLite code, and web assets.
 LICENSE="AGPL-3+ Apache-2.0 0BSD BSD BSD-2 MIT public-domain"
 SLOT="0"
-# A live ebuild has no version to keyword.
-KEYWORDS=""
-# go-module_live_vendor refuses to run without this.
-PROPERTIES="live"
+KEYWORDS="~amd64 ~arm64"
 
 IUSE="ffmpeg"
 
@@ -37,12 +35,6 @@ RDEPEND="
 # rather than replacing the eclass's line, which carries the slot operator and a
 # packaging workaround of its own.
 BDEPEND+=" >=dev-lang/go-1.26 acct-group/imvault acct-user/imvault"
-
-src_unpack() {
-	git-r3_src_unpack
-	# Vendors the modules from go.mod, so the build itself needs no network.
-	go-module_live_vendor
-}
 
 src_compile() {
 	# The SQLite driver is pure Go, so no cgo and no cross-compilation trouble.
