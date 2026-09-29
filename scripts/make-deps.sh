@@ -11,8 +11,10 @@ source_archive=$(realpath "$3") || exit 1
 mkdir -p "$4" || exit 1
 output_dir=$(realpath "$4") || exit 1
 output="$output_dir/$app-$version-deps.tar.xz"
-[[ ! -e $output ]] || fail "Refusing to overwrite $output"
-work=$(mktemp -d) || exit 1
+[[ ! -e $output && ! -L $output ]] || fail "Refusing to overwrite $output"
+# Stage on the destination filesystem, then publish with an exclusive link.
+# Neither concurrent builders nor dangling symlinks may replace a bundle.
+work=$(mktemp -d "$output_dir/.make-deps.XXXXXX") || exit 1
 trap 'rm -rf "$work"' EXIT
 trap 'exit 130' HUP INT TERM
 mkdir "$work/source" || exit 1
@@ -29,5 +31,5 @@ cmp go.sum "$work/original.sum" || fail 'Dependency resolution changed go.sum.'
 tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner --format=gnu \
 	-cf "$work/deps.tar" -C "$work" go-mod || exit 1
 xz -T2 -9 -c "$work/deps.tar" > "$work/deps.tar.xz" || exit 1
-mv "$work/deps.tar.xz" "$output" || exit 1
+ln -T "$work/deps.tar.xz" "$output" || fail "Refusing to overwrite $output"
 printf 'Created %s\n' "$output"
