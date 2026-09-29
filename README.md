@@ -6,7 +6,7 @@ and small communities.
 | Package | Release | What it does |
 | --- | --- | --- |
 | `www-apps/imvault` | `0.10.1` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.7.3` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/witmoot` | `0.8.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. Both also have **live `9999`
@@ -134,10 +134,13 @@ Review protected configuration changes with `dispatch-conf` or `etc-update`,
 then restart the affected service.
 
 Imvault 0.10.1 fixes recovery and two-factor sign-in, atomic password changes,
-administrator safeguards, and SMTP transport. Witmoot 0.7.3 fixes SMTP settings
-under OpenRC. See the [audit report](AUDIT-2026-09-29.md) and upstream
-release notes for details. Existing OpenRC installations should keep both
-configuration files at mode 0600, since they can contain SMTP credentials.
+administrator safeguards, and SMTP transport. The [audit report](AUDIT-2026-09-29.md)
+covers those fixes. Witmoot 0.8.0 adds member suspension, confirmed message
+removal, house rules, and a refined owner interface. Read its
+[upgrade notes](https://github.com/airencracken/witmoot/blob/master/docs/release-notes/0.8.0.md):
+back up the entire stopped data directory before its schema migration. Owner
+usernames appear on the public House rules & owners page. Existing OpenRC
+installations should keep both configuration files at mode 0600, since they can contain SMTP credentials.
 
 Imvault moved from `app-admin/imvault` to `www-apps/imvault`. The overlay includes
 a [package move](https://devmanual.gentoo.org/ebuild-maintenance/package-moves/)
@@ -193,7 +196,7 @@ bash scripts/make-deps.sh imvault 0.10.1 imvault_0.10.1_source.tar.gz /tmp/comfy
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle. Publish
-the bundle under the matching `imvault-0.10.1` or `witmoot-0.7.3` tag in this
+the bundle under the matching `imvault-0.10.1` or `witmoot-0.8.0` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
