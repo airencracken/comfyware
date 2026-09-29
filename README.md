@@ -1,14 +1,12 @@
 # comfyware
 
-A Gentoo overlay for familyware, cozyware, friendware: software for your tribe.
-
-Built for dozens or hundreds of people who know why they're there, not millions
-of strangers who don't.
+Gentoo packages for Imvault and Witmoot: apps you can host for friends, family,
+and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.9.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.7.1` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/imvault` | `0.10.1` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/witmoot` | `0.7.3` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. Both also have **live `9999`
@@ -135,6 +133,12 @@ emerge --ask --update www-apps/imvault::comfyware www-apps/witmoot::comfyware
 Review protected configuration changes with `dispatch-conf` or `etc-update`,
 then restart the affected service.
 
+Imvault 0.10.1 fixes recovery and two-factor sign-in, atomic password changes,
+administrator safeguards, and SMTP transport. Witmoot 0.7.3 fixes SMTP settings
+under OpenRC. See the [audit report](docs/audits/2026-09-29.md) and upstream
+release notes for details. Existing OpenRC installations should keep both
+configuration files at mode 0600, since they can contain SMTP credentials.
+
 Imvault moved from `app-admin/imvault` to `www-apps/imvault`. The overlay includes
 a [package move](https://devmanual.gentoo.org/ebuild-maintenance/package-moves/)
 so Portage can update installed-package records and package references. After
@@ -166,8 +170,9 @@ binary under `/usr/local/bin`.
 
 ## Maintain
 
-Run `pkgcheck scan --exit error` and `bash scripts/test-make-deps.sh` from this
-checkout. GitHub Actions also checks ebuild syntax, dependency-bundle failure
+Run `pkgcheck scan --exit error`, `bash scripts/test-make-deps.sh`,
+`python3 scripts/test-publication.py`, and `python3 scripts/test-manifests.py`
+from this checkout. GitHub Actions also checks ebuild syntax, dependency-bundle failure
 handling, staged service/logging installation against verified release sources,
 and pkgcheck on pushes and pull requests. The install check can run locally with
 `bash scripts/test-install.sh EBUILD SOURCE_DIRECTORY`; it uses an unprivileged
@@ -184,11 +189,11 @@ For a new version, download and verify the upstream source release, then create
 its dependency bundle, for example:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.8.0 imvault_0.8.0_source.tar.gz /tmp/comfyware-distfiles
+bash scripts/make-deps.sh imvault 0.10.1 imvault_0.10.1_source.tar.gz /tmp/comfyware-distfiles
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle. Publish
-the bundle under the matching `imvault-0.8.0` or `witmoot-0.4.0` tag in this
+the bundle under the matching `imvault-0.10.1` or `witmoot-0.7.3` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
