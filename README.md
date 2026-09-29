@@ -135,7 +135,7 @@ then restart the affected service.
 
 Imvault 0.10.1 fixes recovery and two-factor sign-in, atomic password changes,
 administrator safeguards, and SMTP transport. Witmoot 0.7.3 fixes SMTP settings
-under OpenRC. See the [audit report](docs/audits/2026-09-29.md) and upstream
+under OpenRC. See the [audit report](AUDIT-2026-09-29.md) and upstream
 release notes for details. Existing OpenRC installations should keep both
 configuration files at mode 0600, since they can contain SMTP credentials.
 
