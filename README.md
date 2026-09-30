@@ -5,8 +5,8 @@ and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.10.1` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.8.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/imvault` | `0.11.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/witmoot` | `0.9.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. Both also have **live `9999`
@@ -70,6 +70,13 @@ For video thumbnails and duration checks, add this to
 ```text
 www-apps/imvault ffmpeg
 ```
+
+For optional Bubblewrap confinement, add `bubblewrap` to each application's
+USE flags. This installs a non-setuid launcher; enable confinement separately
+in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
+See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.11.0/docs/sandbox.md)
+or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.9.0/docs/sandbox.md)
+for OpenRC settings, systemd overrides and verification.
 
 Install either application or both:
 
@@ -174,7 +181,8 @@ binary under `/usr/local/bin`.
 ## Maintain
 
 Run `pkgcheck scan --exit error`, `bash scripts/test-make-deps.sh`,
-`python3 scripts/test-publication.py`, and `python3 scripts/test-manifests.py`
+`python3 scripts/test-publication.py`, `python3 scripts/test-manifests.py`,
+and `python3 scripts/test-sandbox-packaging.py`
 from this checkout. GitHub Actions also checks ebuild syntax, dependency-bundle failure
 handling, staged service/logging installation against verified release sources,
 and pkgcheck on pushes and pull requests. The install check can run locally with
@@ -192,11 +200,11 @@ For a new version, download and verify the upstream source release, then create
 its dependency bundle, for example:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.10.1 imvault_0.10.1_source.tar.gz /tmp/comfyware-distfiles
+bash scripts/make-deps.sh imvault 0.11.0 imvault_0.11.0_source.tar.gz /tmp/comfyware-distfiles
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle. Publish
-the bundle under the matching `imvault-0.10.1` or `witmoot-0.8.0` tag in this
+the bundle under the matching `imvault-0.11.0` or `witmoot-0.9.0` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.

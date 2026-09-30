@@ -42,6 +42,9 @@ systemd_dounit() { install -Dm0644 "$1" "$ED/usr/lib/systemd/system/$(basename "
 source "$ebuild" || fail 'Could not load ebuild.'
 [[ " $RDEPEND " == *app-admin/logrotate* ]] || fail "$PF does not depend on logrotate."
 [[ " $RDEPEND " == *app-misc/ca-certificates* ]] || fail "$PF needs system CA certificates for outbound HTTPS and TLS mail."
+if [[ " ${IUSE:-} " == *" bubblewrap "* ]]; then
+ [[ " $RDEPEND " == *'bubblewrap? ( sys-apps/bubblewrap[-suid(-)] )'* ]] || fail 'Optional Bubblewrap dependency must reject setuid builds.'
+fi
 src_install || fail "$PF src_install failed."
 cmp contrib/logrotate/"$PN" "$ED/etc/logrotate.d/$PN" || fail 'Packaged logrotate rule is missing or altered.'
 [[ $(stat -c %a "$ED/etc/logrotate.d/$PN") == 644 ]] || fail 'Logrotate rule is not mode 0644.'
