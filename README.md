@@ -1,11 +1,11 @@
 # comfyware
 
-Gentoo packages for imvault and Witmoot: apps you can host for friends, family,
+Gentoo packages for Imvault and Witmoot: apps you can host for friends, family,
 and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.11.1` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/imvault` | `0.11.1` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/witmoot` | `0.9.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -73,8 +73,8 @@ www-apps/imvault ffmpeg
 
 For optional Bubblewrap confinement, add `bubblewrap` to each application's
 USE flags. This installs a non-setuid launcher; enable confinement separately
-in the service settings. imvault's stricter media sandbox also needs `ffmpeg`.
-See the [imvault setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/sandbox.md)
+in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
+See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/sandbox.md)
 or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.9.0/docs/sandbox.md)
 for OpenRC settings, systemd overrides and verification.
 
@@ -90,11 +90,11 @@ They do not enable or start services for you.
 
 | Application | OpenRC configuration | systemd configuration | Data directory |
 | --- | --- | --- | --- |
-| imvault | `/etc/conf.d/imvault` | `/etc/imvault/imvault.env` | `/var/lib/imvault` |
+| Imvault | `/etc/conf.d/imvault` | `/etc/imvault/imvault.env` | `/var/lib/imvault` |
 | Witmoot | `/etc/conf.d/witmoot` | `/etc/witmoot/witmoot.env` | `/var/lib/witmoot` |
 
 Configure your hostname and reverse proxy, and provision the administrator or
-owner before starting. Set `IMVAULT_ADDR="127.0.0.1:8080"` in imvault's service
+owner before starting. Set `IMVAULT_ADDR="127.0.0.1:8080"` in Imvault's service
 configuration; Witmoot's native service defaults to `127.0.0.1:8082`.
 Use `/usr/bin/imvault` or `/usr/bin/witmoot` in the provisioning commands.
 
@@ -102,10 +102,10 @@ Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
 are supported too; both applications install examples for all three under
 `/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
-- [imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/reverse-proxies.md)
+- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/reverse-proxies.md)
 - [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.9.0/docs/reverse-proxies.md)
 
-- [imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/deployment.md)
+- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/deployment.md)
 - [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.9.0/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
@@ -141,14 +141,14 @@ Review protected configuration changes with `dispatch-conf` or `etc-update`,
 then restart the affected service.
 
 Read each application's release notes before upgrading:
-[imvault](https://github.com/airencracken/imvault/tree/master/docs/release-notes)
+[Imvault](https://github.com/airencracken/imvault/tree/master/docs/release-notes)
 and [Witmoot](https://github.com/airencracken/witmoot/tree/master/docs/release-notes).
 Witmoot schema upgrades cannot be undone, so back up the entire stopped data
 directory first. Keep both OpenRC configuration files at mode 0600; they can
 contain SMTP credentials. The [September 2026 audit](AUDIT-2026-09-29.md)
-describes the fixes in imvault 0.10.1 and Witmoot 0.7.3.
+describes the fixes in Imvault 0.10.1 and Witmoot 0.7.3.
 
-imvault moved from `app-admin/imvault` to `www-apps/imvault`. The overlay includes
+Imvault moved from `app-admin/imvault` to `www-apps/imvault`. The overlay includes
 a [package move](https://devmanual.gentoo.org/ebuild-maintenance/package-moves/)
 so Portage can update installed-package records and package references. After
 syncing, review any proposed updates to your `package.*` configuration files.
@@ -189,7 +189,7 @@ with `scripts/verify-distfile.py`, stages service and logging installation, and
 runs pkgcheck on pushes and pull requests. The install check can run locally with
 `bash scripts/test-install.sh EBUILD SOURCE_DIRECTORY`; it uses an unprivileged
 staging directory and leaves account ownership checks to Portage. Enable the `test`
-USE flag for Witmoot's upstream Go tests; imvault also provides `src_test` for
+USE flag for Witmoot's upstream Go tests; Imvault also provides `src_test` for
 Portage's `FEATURES=test`. Full emerge and service checks belong in a disposable
 Gentoo installation, since account packages create real users and groups.
 
