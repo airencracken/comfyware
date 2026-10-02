@@ -7,4 +7,5 @@ inherit acct-group
 
 DESCRIPTION="Service group for Witmoot"
 KEYWORDS="~amd64 ~arm64"
+# Overlay accounts use dynamically allocated IDs.
 ACCT_GROUP_ID=-1
