@@ -4,7 +4,9 @@ cd "$(dirname "$0")/.." || exit 1
 helper="$PWD/scripts/make-deps.sh"
 work=$(mktemp -d) || exit 1
 trap 'rm -rf "$work"' EXIT
-trap 'exit 130' HUP INT TERM
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
 fail() { printf '%s\n' "$*" >&2; exit 1; }
 expect_failure() {
 	local message=$1
@@ -28,12 +30,8 @@ ln -s "$work/missing" "$work/output/imvault-0.6.0-deps.tar.xz" || exit 1
 expect_failure 'Refusing to overwrite' imvault 0.6.0 "$work/source.tar.gz" "$work/output"
 [[ -L $work/output/imvault-0.6.0-deps.tar.xz ]] || fail 'An existing symlink changed.'
 # A failed Go download must never produce an archive that looks publishable.
-cat > "$work/bin/go" <<'EOF'
-#!/bin/sh
-echo 'simulated dependency download failure' >&2
-exit 1
-EOF
-if [[ $? != 0 ]]; then exit 1; fi
+printf '%s\n' '#!/bin/sh' "echo 'simulated dependency download failure' >&2" 'exit 1' \
+	> "$work/bin/go" || exit 1
 chmod 0755 "$work/bin/go" || exit 1
 PATH="$work/bin:$PATH" expect_failure 'simulated dependency download failure' witmoot 0.1.0 "$work/source.tar.gz" "$work/output"
 [[ ! -e $work/output/witmoot-0.1.0-deps.tar.xz ]] || fail 'Failed download left an output bundle.'

@@ -16,7 +16,9 @@ output="$output_dir/$app-$version-deps.tar.xz"
 # Neither concurrent builders nor dangling symlinks may replace a bundle.
 work=$(mktemp -d "$output_dir/.make-deps.XXXXXX") || exit 1
 trap 'rm -rf "$work"' EXIT
-trap 'exit 130' HUP INT TERM
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
 mkdir "$work/source" || exit 1
 tar -xzf "$source_archive" -C "$work/source" --strip-components=1 || exit 1
 cd "$work/source" || exit 1
