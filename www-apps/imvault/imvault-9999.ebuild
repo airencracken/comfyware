@@ -22,7 +22,7 @@ IUSE="bubblewrap ffmpeg"
 # placeholder poster instead of a frame from the video, and the duration limit
 # cannot be enforced.
 RDEPEND="
-	bubblewrap? ( sys-apps/bubblewrap[-suid(-)] )
+	bubblewrap? ( >=sys-apps/bubblewrap-0.8[-suid(-)] )
 	acct-group/imvault
 	acct-user/imvault
 	app-admin/logrotate
@@ -70,7 +70,7 @@ src_install() {
 	# The database and the uploaded bytes live here.
 	keepdir /var/lib/imvault
 	fowners imvault:imvault /var/lib/imvault
-	fperms 0750 /var/lib/imvault
+	fperms 0700 /var/lib/imvault
 
 	newinitd contrib/openrc/imvault imvault
 	newconfd contrib/openrc/imvault.confd imvault
@@ -88,6 +88,32 @@ src_install() {
 	# settings, matching upstream's install instructions.
 	fowners root:imvault /etc/imvault/imvault.env
 	fperms 0640 /etc/imvault/imvault.env
+}
+
+# 0.12.0 replaced IMVAULT_TRUST_PROXY_HEADERS, a switch that believed forwarding
+# headers from any peer, with IMVAULT_TRUSTED_PROXIES, a list of proxy
+# addresses, and refuses to start while the old name is set. Rename it in the
+# installed configuration before the new server can meet it. "true" becomes the
+# loopback proxy that every shipped example uses; any other value trusted
+# nobody, which is the new default, so that line is commented out. Each changed
+# file is copied aside first.
+imvault_rename_trusted_proxies() {
+	local file=$1 loopback='127.0.0.1\/32,::1\/128'
+	[[ -f ${file} ]] || return 0
+	# Only assignments, commented or not, so a second install finds nothing to do.
+	grep -Eq '^[[:space:]]*(#[[:space:]]*)?(export[[:space:]]+)?IMVAULT_TRUST_PROXY_HEADERS=' "${file}" || return 0
+	cp -p "${file}" "${file}.pre-${PV}" || die "could not back up ${file}"
+	sed -E -i \
+		-e "s/^([[:space:]]*#[[:space:]]*)(export[[:space:]]+)?IMVAULT_TRUST_PROXY_HEADERS=.*/\\1IMVAULT_TRUSTED_PROXIES=${loopback}/" \
+		-e "s/^([[:space:]]*)(export[[:space:]]+)?IMVAULT_TRUST_PROXY_HEADERS=[\"']?(1|t|T|TRUE|true|True)[\"']?[[:space:]]*(#.*)?$/\\1\\2IMVAULT_TRUSTED_PROXIES=\"${loopback}\"/" \
+		-e "s/^([[:space:]]*)((export[[:space:]]+)?IMVAULT_TRUST_PROXY_HEADERS=.*)$/\\1# Removed by the ${PV} upgrade; no proxy is trusted unless listed in IMVAULT_TRUSTED_PROXIES: \\2/" \
+		"${file}" || die "could not update ${file}"
+	elog "Renamed IMVAULT_TRUST_PROXY_HEADERS in ${file}; the previous copy is ${file}.pre-${PV}."
+}
+
+pkg_preinst() {
+	imvault_rename_trusted_proxies "${EROOT}/etc/conf.d/imvault"
+	imvault_rename_trusted_proxies "${EROOT}/etc/imvault/imvault.env"
 }
 
 pkg_postinst() {
