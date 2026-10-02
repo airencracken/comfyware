@@ -114,9 +114,17 @@ def readme_errors(readme, newest):
         for pinned in re.findall(rf"github\.com/airencracken/{app}/blob/v([0-9.]+)/", readme):
             if pinned != version:
                 errors.append(f"{app} link pinned to v{pinned}, not v{version}")
-    if "Imvault" in readme:
-        errors.append("imvault is written in lowercase")
+    if re.search(r"\bimvault\b", prose(readme)):
+        errors.append("Imvault is capitalised in prose")
     return errors
+
+
+def prose(markdown):
+    """Drop code, link targets, and URLs, where lowercase names are literal."""
+    markdown = re.sub(r"```.*?```", "", markdown, flags=re.DOTALL)
+    markdown = re.sub(r"`[^`]*`", "", markdown)
+    markdown = re.sub(r"\]\([^)]*\)", "]", markdown)
+    return re.sub(r"https?://\S+", "", markdown)
 
 
 def newest_versions():
@@ -127,6 +135,10 @@ class ReadmeConsistency(unittest.TestCase):
     def test_readme_matches_newest_releases(self):
         self.assertEqual(readme_errors((ROOT / "README.md").read_text(), newest_versions()), [])
 
+    def test_literal_names_are_allowed(self):
+        readme = "Run `imvault --help`, see [Imvault](https://github.com/airencracken/imvault).\n"
+        self.assertEqual(readme_errors(readme, {}), [])
+
     def test_stale_claims_are_rejected(self):
         readme = (ROOT / "README.md").read_text()
         newest = newest_versions()
@@ -134,7 +146,7 @@ class ReadmeConsistency(unittest.TestCase):
         mutations = {
             "package table": readme.replace(f"`www-apps/witmoot` | `{version}`", "`www-apps/witmoot` | `0.0.1`"),
             "pinned to": readme.replace(f"witmoot/blob/v{version}/", "witmoot/blob/v0.0.1/", 1),
-            "lowercase": readme + "\nImvault\n",
+            "capitalised": readme + "\nInstall imvault first.\n",
         }
         for expected, mutated in mutations.items():
             with self.subTest(mutation=expected):
