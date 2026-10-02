@@ -15,11 +15,11 @@ EGIT_BRANCH="master"
 # Go dependencies, their bundled code, and the embedded HTMX asset.
 LICENSE="AGPL-3+ 0BSD BSD BSD-2 MIT public-domain"
 SLOT="0"
-KEYWORDS=""
+# go-module_live_vendor refuses to run without this.
 PROPERTIES="live"
 IUSE="bubblewrap test"
 RESTRICT="!test? ( test )"
-DOCS=( LICENSE README.md THIRD_PARTY.md )
+DOCS=( README.md THIRD_PARTY.md )
 
 RDEPEND="
 	bubblewrap? ( sys-apps/bubblewrap[-suid(-)] )
@@ -37,6 +37,7 @@ BDEPEND+="
 
 src_unpack() {
 	git-r3_src_unpack
+	# Vendor the modules from go.mod so the build itself needs no network.
 	go-module_live_vendor
 }
 
@@ -45,7 +46,7 @@ src_configure() {
 }
 
 src_compile() {
-	CGO_ENABLED=0 ego build -buildvcs=false -trimpath -o witmoot ./cmd/witmoot
+	CGO_ENABLED=0 ego build -trimpath -o witmoot ./cmd/witmoot
 }
 
 src_test() {
@@ -58,11 +59,14 @@ src_install() {
 	dodoc -r docs
 	docinto examples
 	dodoc -r contrib/caddy contrib/nginx contrib/apache
+	# The proxy examples are meant to be copied as they are.
+	docompress -x "/usr/share/doc/${PF}/examples"
 
 	keepdir /var/lib/witmoot
 	fowners witmoot:witmoot /var/lib/witmoot
 	fperms 0700 /var/lib/witmoot
 
+	# Packages install into /usr, unlike the source-install default.
 	sed 's|/usr/local/bin/witmoot|/usr/bin/witmoot|g' \
 		contrib/openrc/witmoot > "${T}/witmoot.initd" || die
 	newinitd "${T}/witmoot.initd" witmoot
@@ -80,11 +84,11 @@ src_install() {
 }
 
 pkg_postinst() {
-	elog "Bubblewrap confinement is optional; see docs/sandbox.md."
 	elog "Configure /etc/conf.d/witmoot (OpenRC) or /etc/witmoot/witmoot.env (systemd)."
 	elog "The native service listens on 127.0.0.1:8082 and uses /var/lib/witmoot."
-	elog "Provision an owner before starting; see docs/deployment.md in the source tree."
-	elog "OpenRC logs need logrotate's cron job or timer enabled."
-	elog "Back up the full data directory before first start; schema upgrades prevent downgrades."
-	elog "Review House rules and owners in Settings; /about lists owner usernames before sign-in."
+	elog "Provision an owner before starting; see docs/deployment.md."
+	elog "Bubblewrap confinement is optional; see docs/sandbox.md."
+	elog "Both guides are in /usr/share/doc/${PF}/docs/ and at"
+	elog "https://github.com/airencracken/witmoot/tree/master/docs"
+	elog "Back up the full data directory before upgrades; schema upgrades prevent downgrades."
 }

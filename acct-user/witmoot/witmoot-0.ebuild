@@ -7,6 +7,7 @@ inherit acct-user
 
 DESCRIPTION="Service account for Witmoot"
 KEYWORDS="~amd64 ~arm64"
+# Overlay accounts use dynamically allocated IDs.
 ACCT_USER_ID=-1
 ACCT_USER_GROUPS=( witmoot )
 ACCT_USER_HOME=/var/lib/witmoot
