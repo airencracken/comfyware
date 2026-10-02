@@ -7,7 +7,12 @@ import unittest
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"imvault": "0.11.1", "witmoot": "0.9.0"}
+APPS = ("imvault", "witmoot")
+
+
+def recipes(app):
+    """Every release and live recipe, so new versions are checked without edits."""
+    return sorted((ROOT / "www-apps" / app).glob(f"{app}-*.ebuild"))
 
 
 def validate_recipe(text):
@@ -30,17 +35,20 @@ def validate_metadata(text):
 
 class SandboxPackaging(unittest.TestCase):
     def test_release_and_live_recipes(self):
-        for app, version in VERSIONS.items():
-            for release in (version, "9999"):
-                with self.subTest(app=app, version=release):
-                    validate_recipe((ROOT / "www-apps" / app / f"{app}-{release}.ebuild").read_text())
+        for app in APPS:
+            found = recipes(app)
+            self.assertTrue(any(r.stem.endswith("-9999") for r in found), f"{app} has no live recipe")
+            self.assertGreater(len(found), 1, f"{app} has no release recipe")
+            for recipe in found:
+                with self.subTest(recipe=recipe.name):
+                    validate_recipe(recipe.read_text())
 
     def test_use_metadata(self):
-        for app in VERSIONS:
+        for app in APPS:
             validate_metadata((ROOT / "www-apps" / app / "metadata.xml").read_text())
 
     def test_recipe_mutations(self):
-        text = (ROOT / "www-apps/imvault/imvault-0.11.1.ebuild").read_text()
+        text = next(r for r in recipes("imvault") if not r.stem.endswith("-9999")).read_text()
         for broken in (
             text.replace('IUSE="bubblewrap', 'IUSE="+bubblewrap'),
             text.replace("bubblewrap? (", ""),

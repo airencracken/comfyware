@@ -46,7 +46,8 @@ class ManifestTests(unittest.TestCase):
                     version = recipe.stem.removeprefix(app + "-")
                     if version == "9999":
                         continue
-                    self.assertRegex(version, r"^\d+\.\d+\.\d+$")
+                    self.assertRegex(version, r"^\d+\.\d+\.\d+(-r\d+)?$")
+                    version = version.split("-r", 1)[0]
                     expected.update((f"{app}-{version}-deps.tar.xz",
                                      f"{app}_{version}_source.tar.gz"))
                 self.assertEqual(validate_manifest((package / "Manifest").read_text().splitlines(), expected), [])
