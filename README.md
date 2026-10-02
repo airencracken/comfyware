@@ -1,6 +1,6 @@
 # comfyware
 
-Gentoo packages for Imvault and Witmoot: apps you can host for friends, family,
+Gentoo packages for imvault and Witmoot: apps you can host for friends, family,
 and small communities.
 
 | Package | Release | What it does |
@@ -73,8 +73,8 @@ www-apps/imvault ffmpeg
 
 For optional Bubblewrap confinement, add `bubblewrap` to each application's
 USE flags. This installs a non-setuid launcher; enable confinement separately
-in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
-See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.11.0/docs/sandbox.md)
+in the service settings. imvault's stricter media sandbox also needs `ffmpeg`.
+See the [imvault setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/sandbox.md)
 or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.9.0/docs/sandbox.md)
 for OpenRC settings, systemd overrides and verification.
 
@@ -102,11 +102,11 @@ Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
 are supported too; both applications install examples for all three under
 `/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
-- [imvault proxy setup](https://github.com/airencracken/imvault/blob/master/docs/reverse-proxies.md)
-- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/master/docs/reverse-proxies.md)
+- [imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/reverse-proxies.md)
+- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.9.0/docs/reverse-proxies.md)
 
-- [imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/master/docs/deployment.md)
-- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/master/docs/deployment.md)
+- [imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.11.1/docs/deployment.md)
+- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.9.0/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
 and service paths. Generate a site configuration for your hostname with:
@@ -140,20 +140,15 @@ emerge --ask --update www-apps/imvault::comfyware www-apps/witmoot::comfyware
 Review protected configuration changes with `dispatch-conf` or `etc-update`,
 then restart the affected service.
 
-Imvault 0.11.1 refines member invitations: grant access with **Allow invites** on
-the Users page. Read the [release notes](https://github.com/airencracken/imvault/blob/v0.11.1/docs/release-notes/0.11.1.md)
-for permission removal, disabled issuers, and provider signup attribution.
+Read each application's release notes before upgrading:
+[imvault](https://github.com/airencracken/imvault/tree/master/docs/release-notes)
+and [Witmoot](https://github.com/airencracken/witmoot/tree/master/docs/release-notes).
+Witmoot schema upgrades cannot be undone, so back up the entire stopped data
+directory first. Keep both OpenRC configuration files at mode 0600; they can
+contain SMTP credentials. The [September 2026 audit](AUDIT-2026-09-29.md)
+describes the fixes in imvault 0.10.1 and Witmoot 0.7.3.
 
-Imvault 0.10.1 fixes recovery and two-factor sign-in, atomic password changes,
-administrator safeguards, and SMTP transport. The [audit report](AUDIT-2026-09-29.md)
-covers those fixes. Witmoot 0.8.0 adds member suspension, confirmed message
-removal, house rules, and a refined owner interface. Read its
-[upgrade notes](https://github.com/airencracken/witmoot/blob/master/docs/release-notes/0.8.0.md):
-back up the entire stopped data directory before its schema migration. Owner
-usernames appear on the public House rules & owners page. Existing OpenRC
-installations should keep both configuration files at mode 0600, since they can contain SMTP credentials.
-
-Imvault moved from `app-admin/imvault` to `www-apps/imvault`. The overlay includes
+imvault moved from `app-admin/imvault` to `www-apps/imvault`. The overlay includes
 a [package move](https://devmanual.gentoo.org/ebuild-maintenance/package-moves/)
 so Portage can update installed-package records and package references. After
 syncing, review any proposed updates to your `package.*` configuration files.
@@ -185,11 +180,13 @@ binary under `/usr/local/bin`.
 ## Maintain
 
 Run `pkgcheck scan --exit error`, `bash scripts/test-make-deps.sh`,
-`python3 scripts/test-publication.py`, `python3 scripts/test-manifests.py`,
-and `python3 scripts/test-sandbox-packaging.py`
-from this checkout. GitHub Actions also checks ebuild syntax, dependency-bundle failure
-handling, staged service/logging installation against verified release sources,
-and pkgcheck on pushes and pull requests. The install check can run locally with
+`shellcheck scripts/*.sh`, and each `python3 scripts/test-*.py` from this
+checkout. `scripts/test-recipes.py` keeps each live ebuild identical to its
+newest release apart from the source, and rejects pre-stripped binaries,
+compressed proxy examples, and install-check regressions. GitHub Actions also
+checks ebuild syntax, verifies downloaded release sources against the Manifest
+with `scripts/verify-distfile.py`, stages service and logging installation, and
+runs pkgcheck on pushes and pull requests. The install check can run locally with
 `bash scripts/test-install.sh EBUILD SOURCE_DIRECTORY`; it uses an unprivileged
 staging directory and leaves account ownership checks to Portage. Enable the `test`
 USE flag for Witmoot's upstream Go tests; imvault also provides `src_test` for
