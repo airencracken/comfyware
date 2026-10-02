@@ -20,10 +20,15 @@ def validate_recipe(text):
     if not flags or "bubblewrap" not in flags[1].split():
         raise ValueError("Bubblewrap must be an optional, disabled-by-default USE flag")
     dependencies = re.search(r'^RDEPEND="([^"]*)"', text, re.MULTILINE)
-    if not dependencies or not re.search(
-        r'bubblewrap\?\s*\(\s*sys-apps/bubblewrap\[-suid\(-\)\]\s*\)', dependencies[1]
-    ):
-        raise ValueError("Bubblewrap dependency must be conditional and reject setuid builds")
+    # --disable-userns, which the service policy passes, arrived in 0.8.
+    conditional = r'bubblewrap\?\s*\(\s*>=sys-apps/bubblewrap-0\.8\[-suid\(-\)\]\s*\)'
+    if not dependencies or not re.search(conditional, dependencies[1]):
+        raise ValueError("Bubblewrap dependency must be conditional, at least 0.8, and reject setuid builds")
+    # Nothing else may pull Bubblewrap in when the flag is off.
+    for name in ("RDEPEND", "DEPEND", "BDEPEND", "PDEPEND"):
+        for value in re.findall(rf'^{name}\+?="([^"]*)"', text, re.MULTILINE):
+            if "sys-apps/bubblewrap" in re.sub(conditional, "", value):
+                raise ValueError(f"{name} pulls in Bubblewrap without the USE flag")
 
 
 def validate_metadata(text):
@@ -54,6 +59,10 @@ class SandboxPackaging(unittest.TestCase):
             text.replace("bubblewrap? (", ""),
             text.replace("[-suid(-)]", ""),
             text.replace("sys-apps/bubblewrap", "sys-apps/not-bubblewrap"),
+            text.replace(">=sys-apps/bubblewrap-0.8", "sys-apps/bubblewrap"),
+            text.replace(">=sys-apps/bubblewrap-0.8", ">=sys-apps/bubblewrap-0.7"),
+            text.replace('BDEPEND+="\n', 'BDEPEND+="\n\tsys-apps/bubblewrap\n', 1),
+            text.replace('RDEPEND="\n', 'RDEPEND="\n\tsys-apps/bubblewrap\n', 1),
         ):
             with self.assertRaises(ValueError):
                 validate_recipe(broken)

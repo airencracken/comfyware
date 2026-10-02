@@ -2,6 +2,7 @@
 """Check recipe conventions, release/live parity, and the staged install check."""
 
 from pathlib import Path
+import os
 import re
 import subprocess
 import tempfile
@@ -152,6 +153,130 @@ class ReadmeConsistency(unittest.TestCase):
             with self.subTest(mutation=expected):
                 self.assertNotEqual(mutated, readme, "mutation did not apply")
                 self.assertTrue(any(expected in error for error in readme_errors(mutated, newest)))
+
+
+LOOPBACK = "127.0.0.1/32,::1/128"
+
+
+def run_rename(text, files, rounds=1):
+    """Run the newest Imvault recipe's pkg_preinst against fixture files.
+
+    files maps a path under /etc to its contents (None for absent). Returns the
+    resulting contents, backups, and the log, after the given number of runs.
+    """
+    import re as _re
+    functions = _re.findall(r"^(imvault_rename_trusted_proxies\(\) \{.*?^\}|pkg_preinst\(\) \{.*?^\})",
+                            text, _re.MULTILINE | _re.DOTALL)
+    if len(functions) != 2:
+        raise AssertionError("the recipe has no rename function and pkg_preinst")
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        for name, content in files.items():
+            if content is not None:
+                path = root / name.lstrip("/")
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(content)
+                path.chmod(0o600)
+        script = "\n".join([
+            "die() { printf 'die: %s\\n' \"$*\" >&2; exit 1; }",
+            "elog() { printf 'elog: %s\\n' \"$*\"; }",
+            f"EROOT={root}", "PV=0.12.0", *functions,
+            *(["pkg_preinst || exit 1"] * rounds),
+        ])
+        result = subprocess.run(["bash", "-c", script], capture_output=True, text=True, timeout=30)
+        if result.returncode != 0:
+            raise AssertionError(result.stderr)
+        state = {}
+        for path in sorted(p for p in root.rglob("*") if p.is_file()):
+            state["/" + str(path.relative_to(root))] = (path.read_text(), path.stat().st_mode & 0o777)
+        return state, result.stdout
+
+
+class TrustedProxyRename(unittest.TestCase):
+    """The 0.12.0 recipe renames the setting the new server refuses."""
+
+    def setUp(self):
+        self.text = release_recipes("imvault")[-1].read_text()
+
+    def rename(self, line, rounds=1):
+        state, log = run_rename(self.text, {"/etc/conf.d/imvault": f"IMVAULT_ADDR=127.0.0.1:8080\n{line}\n"}, rounds)
+        return state["/etc/conf.d/imvault"][0].splitlines()[1], state, log
+
+    def test_true_becomes_the_loopback_proxy(self):
+        for line, want in {
+            "IMVAULT_TRUST_PROXY_HEADERS=true": f'IMVAULT_TRUSTED_PROXIES="{LOOPBACK}"',
+            'IMVAULT_TRUST_PROXY_HEADERS="TRUE"': f'IMVAULT_TRUSTED_PROXIES="{LOOPBACK}"',
+            "export IMVAULT_TRUST_PROXY_HEADERS='1'": f'export IMVAULT_TRUSTED_PROXIES="{LOOPBACK}"',
+            "  IMVAULT_TRUST_PROXY_HEADERS=t  # behind caddy": f'  IMVAULT_TRUSTED_PROXIES="{LOOPBACK}"',
+        }.items():
+            with self.subTest(line=line):
+                self.assertEqual(self.rename(line)[0], want)
+
+    def test_other_values_trusted_nobody_and_are_commented_out(self):
+        for line in ("IMVAULT_TRUST_PROXY_HEADERS=false", "IMVAULT_TRUST_PROXY_HEADERS=",
+                     "IMVAULT_TRUST_PROXY_HEADERS=yes", 'IMVAULT_TRUST_PROXY_HEADERS="$(id)"'):
+            with self.subTest(line=line):
+                renamed = self.rename(line)[0]
+                self.assertTrue(renamed.startswith("# Removed by the 0.12.0 upgrade"), renamed)
+                self.assertTrue(renamed.endswith(line), renamed)
+
+    def test_the_shipped_comment_becomes_the_new_example(self):
+        self.assertEqual(self.rename("# IMVAULT_TRUST_PROXY_HEADERS=true")[0],
+                         f"# IMVAULT_TRUSTED_PROXIES={LOOPBACK}")
+
+    def test_both_configuration_files_are_renamed_and_backed_up(self):
+        files = {"/etc/conf.d/imvault": "IMVAULT_TRUST_PROXY_HEADERS=true\n",
+                 "/etc/imvault/imvault.env": "IMVAULT_TRUST_PROXY_HEADERS=true\n"}
+        state, log = run_rename(self.text, files)
+        for name, original in files.items():
+            self.assertEqual(state[name][0], f'IMVAULT_TRUSTED_PROXIES="{LOOPBACK}"\n')
+            self.assertEqual(state[name + ".pre-0.12.0"], (original, 0o600), "backup keeps contents and mode")
+            self.assertIn(name, log)
+
+    def test_the_result_is_what_the_server_reads(self):
+        state, _ = run_rename(self.text, {"/etc/conf.d/imvault": "IMVAULT_TRUST_PROXY_HEADERS=true\n"})
+        with tempfile.NamedTemporaryFile("w", suffix=".sh") as config:
+            config.write(state["/etc/conf.d/imvault"][0])
+            config.flush()
+            value = subprocess.run(["sh", "-c", f'. "{config.name}" && printf %s "$IMVAULT_TRUSTED_PROXIES"'],
+                                   capture_output=True, text=True, check=True).stdout
+        self.assertEqual(value, LOOPBACK)
+        self.assertNotIn("IMVAULT_TRUST_PROXY_HEADERS=", state["/etc/conf.d/imvault"][0].replace("# Removed", ""))
+
+    def test_untouched_files_and_reinstalls_change_nothing(self):
+        state, log = run_rename(self.text, {"/etc/conf.d/imvault": "IMVAULT_ADDR=127.0.0.1:8080\n",
+                                            "/etc/imvault/imvault.env": None})
+        self.assertEqual(list(state), ["/etc/conf.d/imvault"], "no backup or new file")
+        self.assertEqual(log, "")
+        for line in ("IMVAULT_TRUST_PROXY_HEADERS=true", "IMVAULT_TRUST_PROXY_HEADERS=false"):
+            with self.subTest(line=line):
+                once = self.rename(line)
+                twice = self.rename(line, rounds=2)
+                self.assertEqual(once[0], twice[0])
+                self.assertEqual(twice[1]["/etc/conf.d/imvault.pre-0.12.0"][0],
+                                 f"IMVAULT_ADDR=127.0.0.1:8080\n{line}\n", "a second run kept the first backup")
+                self.assertEqual(twice[2].count("elog:"), 1)
+
+    def test_mutations_are_caught(self):
+        mutations = {
+            "no rename in preinst": self.text.replace(
+                '\timvault_rename_trusted_proxies "${EROOT}/etc/conf.d/imvault"\n', ""),
+            "true not recognised": self.text.replace("(1|t|T|TRUE|true|True)", "(yes)"),
+            "matches any mention": self.text.replace(
+                "grep -Eq '^[[:space:]]*(#[[:space:]]*)?(export[[:space:]]+)?IMVAULT_TRUST_PROXY_HEADERS=' ",
+                "grep -q 'IMVAULT_TRUST_PROXY_HEADERS' "),
+        }
+        for name, mutated in mutations.items():
+            with self.subTest(mutation=name):
+                self.assertNotEqual(mutated, self.text, "mutation did not apply")
+                suite = unittest.TestSuite()
+                for test in ("test_true_becomes_the_loopback_proxy", "test_both_configuration_files_are_renamed_and_backed_up",
+                             "test_untouched_files_and_reinstalls_change_nothing"):
+                    case = TrustedProxyRename(test)
+                    case.setUp = (lambda c=case, m=mutated: setattr(c, "text", m))
+                    suite.addTest(case)
+                result = unittest.TextTestRunner(stream=open(os.devnull, "w")).run(suite)
+                self.assertFalse(result.wasSuccessful(), "mutation survived")
 
 
 def write_fixture(source, app, bin_default):

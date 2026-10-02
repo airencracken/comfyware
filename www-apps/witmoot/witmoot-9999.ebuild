@@ -22,7 +22,7 @@ RESTRICT="!test? ( test )"
 DOCS=( README.md THIRD_PARTY.md )
 
 RDEPEND="
-	bubblewrap? ( sys-apps/bubblewrap[-suid(-)] )
+	bubblewrap? ( >=sys-apps/bubblewrap-0.8[-suid(-)] )
 	acct-group/witmoot
 	acct-user/witmoot
 	app-admin/logrotate
