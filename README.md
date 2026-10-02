@@ -5,7 +5,7 @@ and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.11.0` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/imvault` | `0.11.1` | [imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/witmoot` | `0.9.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -140,6 +140,10 @@ emerge --ask --update www-apps/imvault::comfyware www-apps/witmoot::comfyware
 Review protected configuration changes with `dispatch-conf` or `etc-update`,
 then restart the affected service.
 
+Imvault 0.11.1 refines member invitations: grant access with **Allow invites** on
+the Users page. Read the [release notes](https://github.com/airencracken/imvault/blob/v0.11.1/docs/release-notes/0.11.1.md)
+for permission removal, disabled issuers, and provider signup attribution.
+
 Imvault 0.10.1 fixes recovery and two-factor sign-in, atomic password changes,
 administrator safeguards, and SMTP transport. The [audit report](AUDIT-2026-09-29.md)
 covers those fixes. Witmoot 0.8.0 adds member suspension, confirmed message
@@ -200,11 +204,11 @@ For a new version, download and verify the upstream source release, then create
 its dependency bundle, for example:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.11.0 imvault_0.11.0_source.tar.gz /tmp/comfyware-distfiles
+bash scripts/make-deps.sh imvault 0.11.1 imvault_0.11.1_source.tar.gz /tmp/comfyware-distfiles
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle. Publish
-the bundle under the matching `imvault-0.11.0` or `witmoot-0.9.0` tag in this
+the bundle under the matching `imvault-0.11.1` or `witmoot-0.9.0` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.

@@ -7,7 +7,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"imvault": "0.11.0", "witmoot": "0.9.0"}
+VERSIONS = {"imvault": "0.11.1", "witmoot": "0.9.0"}
 
 
 def validate_recipe(text):
@@ -40,7 +40,7 @@ class SandboxPackaging(unittest.TestCase):
             validate_metadata((ROOT / "www-apps" / app / "metadata.xml").read_text())
 
     def test_recipe_mutations(self):
-        text = (ROOT / "www-apps/imvault/imvault-0.11.0.ebuild").read_text()
+        text = (ROOT / "www-apps/imvault/imvault-0.11.1.ebuild").read_text()
         for broken in (
             text.replace('IUSE="bubblewrap', 'IUSE="+bubblewrap'),
             text.replace("bubblewrap? (", ""),
