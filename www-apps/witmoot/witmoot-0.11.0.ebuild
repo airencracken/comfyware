@@ -1,22 +1,23 @@
 # Copyright 2026 Marcus J. Hildum
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Live ebuild for the master branch.
 
 EAPI=8
 
-inherit git-r3 go-module systemd
+inherit go-module systemd
 
 DESCRIPTION="A small, self-hosted bulletin board for friends and family"
 HOMEPAGE="https://github.com/airencracken/witmoot"
-EGIT_REPO_URI="https://github.com/airencracken/witmoot.git"
-EGIT_BRANCH="master"
+SRC_URI="
+	https://github.com/airencracken/witmoot/releases/download/v${PV}/${PN}_${PV}_source.tar.gz
+	https://github.com/airencracken/comfyware/releases/download/${P}/${P}-deps.tar.xz
+"
+S="${WORKDIR}/${PN}_${PV}_source"
 
 # Witmoot uses AGPL-3.0-or-later. The remaining entries cover the linked
 # Go dependencies, their bundled code, and the embedded HTMX asset.
 LICENSE="AGPL-3+ 0BSD BSD BSD-2 MIT public-domain"
 SLOT="0"
-# go-module_live_vendor refuses to run without this.
-PROPERTIES="live"
+KEYWORDS="~amd64 ~arm64"
 IUSE="bubblewrap test"
 RESTRICT="!test? ( test )"
 DOCS=( README.md THIRD_PARTY.md )
@@ -34,12 +35,6 @@ BDEPEND+="
 	acct-user/witmoot
 	test? ( app-admin/logrotate )
 "
-
-src_unpack() {
-	git-r3_src_unpack
-	# Vendor the modules from go.mod so the build itself needs no network.
-	go-module_live_vendor
-}
 
 src_configure() {
 	go-module_src_configure
@@ -89,7 +84,7 @@ pkg_postinst() {
 	elog "Provision an owner before starting; see docs/deployment.md."
 	elog "Bubblewrap confinement is optional; see docs/sandbox.md."
 	elog "Both guides are in /usr/share/doc/${PF}/docs/ and at"
-	elog "https://github.com/airencracken/witmoot/tree/master/docs"
+	elog "https://github.com/airencracken/witmoot/tree/v${PV}/docs"
 	elog "Ordinary CLI commands refuse outdated schemas; stop the service before witmoot migrate."
 	elog "Back up the full data directory before upgrades; schema upgrades prevent downgrades."
 }

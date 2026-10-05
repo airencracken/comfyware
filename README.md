@@ -5,8 +5,8 @@ and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.12.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.10.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/imvault` | `0.13.1` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/witmoot` | `0.11.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. Both also have **live `9999`
@@ -74,8 +74,8 @@ www-apps/imvault ffmpeg
 For optional Bubblewrap confinement, add `bubblewrap` to each application's
 USE flags. This installs a non-setuid launcher; enable confinement separately
 in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
-See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.12.0/docs/sandbox.md)
-or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.10.0/docs/sandbox.md)
+See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.13.1/docs/sandbox.md)
+or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.11.0/docs/sandbox.md)
 for OpenRC settings, systemd overrides and verification.
 
 Install either application or both:
@@ -102,11 +102,11 @@ Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
 are supported too; both applications install examples for all three under
 `/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
-- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.12.0/docs/reverse-proxies.md)
-- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.10.0/docs/reverse-proxies.md)
+- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.13.1/docs/reverse-proxies.md)
+- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.11.0/docs/reverse-proxies.md)
 
-- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.12.0/docs/deployment.md)
-- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.10.0/docs/deployment.md)
+- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.13.1/docs/deployment.md)
+- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.11.0/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
 and service paths. Generate a site configuration for your hostname with:
@@ -126,6 +126,19 @@ OpenRC logs go to `/var/log/imvault.log` and `/var/log/witmoot.log`. The ebuilds
 depend on `app-admin/logrotate` and install each rule in `/etc/logrotate.d/`.
 Keep logrotate's cron job or timer enabled. Both systemd units explicitly send
 stdout and stderr to journald, which handles rotation and retention.
+
+### Optional Imvault backups
+
+Imvault 0.13 can take verified snapshots while browsing and uploads continue.
+Create `/var/backups/imvault` with mode 0700, owned by the service account. On
+systemd, enable `imvault-backup.timer`. For OpenRC, copy the uncompressed
+`examples/cron/imvault-backup` from the package documentation into `/etc/cron.d/`,
+mode 0644. Enable one scheduler; installation enables neither. The root-run CLI
+reads service settings and switches to the service account. Both examples keep
+the newest seven completed snapshots; rotation follows successful verification.
+Change `--keep` to choose another count; manual snapshots never rotate. Keep an
+off-host copy and test restores. See the upstream
+[operations guide](https://github.com/airencracken/imvault/blob/v0.13.1/docs/operations.md).
 
 ## Update
 
@@ -201,11 +214,11 @@ For a new version, download and verify the upstream source release, then create
 its dependency bundle, for example:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.12.0 imvault_0.12.0_source.tar.gz /tmp/comfyware-distfiles
+bash scripts/make-deps.sh imvault 0.13.1 imvault_0.13.1_source.tar.gz /tmp/comfyware-distfiles
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle. Publish
-the bundle under the matching `imvault-0.12.0` or `witmoot-0.10.0` tag in this
+the bundle under the matching `imvault-0.13.1` or `witmoot-0.11.0` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.

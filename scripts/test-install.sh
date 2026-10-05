@@ -83,4 +83,9 @@ grep -Eq "^ExecStart=(\"/usr/bin/$PN\"|/usr/bin/$PN)$" "$unit" || fail 'systemd 
 for setting in StandardOutput=journal StandardError=journal "SyslogIdentifier=$PN"; do
 	grep -qx "$setting" "$unit" || fail "Packaged systemd unit is missing $setting."
 done
+if [[ $PN == imvault && -f contrib/systemd/imvault-backup.service ]]; then
+	grep -qx 'ExecStart=/usr/bin/imvault backup --output-dir /var/backups/imvault --keep 7' "$ED/usr/lib/systemd/system/imvault-backup.service" || fail 'Packaged backup command is incorrect.'
+	cmp contrib/systemd/imvault-backup.timer "$ED/usr/lib/systemd/system/imvault-backup.timer" || fail 'Packaged backup timer differs.'
+	[[ ! -e $ED/etc/cron.d/imvault-backup ]] || fail 'Package enables cron backups without consent.'
+fi
 printf '%s: staged binary, OpenRC, logrotate, and journald checks passed.\n' "$PF"

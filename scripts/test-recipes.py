@@ -69,6 +69,51 @@ def live_equivalent(release_text, app):
     return text.replace("/tree/v${PV}/docs", "/tree/master/docs")
 
 
+def compile_arguments(recipe, app, version):
+    """Execute the compile phase with a recording Go helper."""
+    script = r"""
+inherit() { :; }
+ego() { printf '%s\0' "$@"; }
+PN=$2
+PV=$3
+source "$1" || exit 1
+src_compile || exit 1
+"""
+    result = subprocess.run(["bash", "-c", script, "compile-test", str(recipe), app, version],
+                            check=True, capture_output=True)
+    return result.stdout.decode().rstrip("\0").split("\0")
+
+
+def validate_compiled_version(arguments, version):
+    if arguments.count("-ldflags") != 1:
+        raise ValueError("compile must stamp one version")
+    if arguments[arguments.index("-ldflags") + 1] != "-X main.version=" + version:
+        raise ValueError("compile stamped the wrong version")
+
+
+class CompiledVersionTests(unittest.TestCase):
+    def test_release_and_live_builds_report_the_package_version(self):
+        for app in APPS:
+            release = release_recipes(app)[-1]
+            for recipe, version in [(release, release.stem.removeprefix(app + "-")),
+                                    (release.parent / f"{app}-9999.ebuild", "9999")]:
+                with self.subTest(recipe=recipe.name):
+                    arguments = compile_arguments(recipe, app, version)
+                    validate_compiled_version(arguments, version)
+                    self.assertEqual(arguments[0], "build")
+                    self.assertEqual(arguments[-1], f"./cmd/{app}")
+
+    def test_missing_or_wrong_version_is_rejected(self):
+        recipe = release_recipes("imvault")[-1]
+        for text in [recipe.read_text().replace(' -ldflags "-X main.version=${PV}"', ''),
+                     recipe.read_text().replace('-X main.version=${PV}', '-X main.version=old')]:
+            with tempfile.TemporaryDirectory() as directory:
+                broken = Path(directory) / "imvault.ebuild"
+                broken.write_text(text)
+                with self.assertRaises(ValueError):
+                    validate_compiled_version(compile_arguments(broken, "imvault", "0.13.1"), "0.13.1")
+
+
 class RecipeConventions(unittest.TestCase):
     def test_every_recipe_follows_conventions(self):
         for app in APPS:
@@ -275,7 +320,8 @@ class TrustedProxyRename(unittest.TestCase):
                     case = TrustedProxyRename(test)
                     case.setUp = (lambda c=case, m=mutated: setattr(c, "text", m))
                     suite.addTest(case)
-                result = unittest.TextTestRunner(stream=open(os.devnull, "w")).run(suite)
+                with open(os.devnull, "w") as output:
+                    result = unittest.TextTestRunner(stream=output).run(suite)
                 self.assertFalse(result.wasSuccessful(), "mutation survived")
 
 
@@ -291,6 +337,12 @@ def write_fixture(source, app, bin_default):
                                           f"SyslogIdentifier={app}\nExecStart=/usr/local/bin/{app}\n",
         f"contrib/systemd/{app}.env": f"# {upper}_ADDR=127.0.0.1:8080\n",
     }
+    if app == "imvault":
+        files.update({
+            "contrib/systemd/imvault-backup.service": "[Service]\nExecStart=/usr/local/bin/imvault backup --output-dir /var/backups/imvault --keep 7\n",
+            "contrib/systemd/imvault-backup.timer": "[Timer]\nOnCalendar=*-*-* 03:00:00\n",
+            "contrib/cron/imvault-backup": "17 3 * * * root /usr/bin/imvault backup --output-dir /var/backups/imvault --keep 7\n",
+        })
     for name, content in files.items():
         path = source / name
         path.parent.mkdir(parents=True, exist_ok=True)
