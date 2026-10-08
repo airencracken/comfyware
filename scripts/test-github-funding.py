@@ -8,7 +8,7 @@ import sys
 import unittest
 import urllib.request
 
-REPOSITORIES = ("comfyware", "comfyware_org", "imvault", "witmoot")
+REPOSITORIES = ("comfyware", "comfyware_org", "imvault", "witmoot", "songstead")
 SUPPORT_URL = "https://ko-fi.com/airencracken"
 LIVE = "--live" in sys.argv
 if LIVE:

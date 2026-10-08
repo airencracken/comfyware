@@ -25,6 +25,8 @@ cd "$work/source" || exit 1
 [[ -f go.mod && -f go.sum ]] || fail 'Source archive must contain go.mod and go.sum.'
 cp go.mod "$work/original.mod" || exit 1
 cp go.sum "$work/original.sum" || exit 1
+# Resolve the release's modules even when the caller has a development workspace.
+export GOWORK=off
 GOTOOLCHAIN=local GOMODCACHE="$work/go-mod" go mod download -modcacherw || exit 1
 GOTOOLCHAIN=local GOMODCACHE="$work/go-mod" go mod verify || exit 1
 cmp go.mod "$work/original.mod" || fail 'Dependency resolution changed go.mod.'

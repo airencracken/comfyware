@@ -29,20 +29,47 @@ class PublicationTests(unittest.TestCase):
         self.binary = self.work / "bin"
         self.binary.mkdir()
 
-    def run_bundle(self, script):
+    def run_bundle(self, script, app="imvault", workspace="auto", helper=None):
         go = self.binary / "go"
         go.write_text("#!/bin/sh\n" + script)
         go.chmod(0o755)
         result = subprocess.run(
-            ["bash", str(ROOT / "scripts/make-deps.sh"), "imvault", "1.2.3",
+            ["bash", str(helper or ROOT / "scripts/make-deps.sh"), app, "1.2.3",
              str(self.archive), str(self.output)],
             env={**os.environ, "PATH": f"{self.binary}:{os.environ['PATH']}",
-                 "PUBLICATION_TARGET": str(self.target)},
+                 "PUBLICATION_TARGET": str(self.target), "GOWORK": workspace},
             capture_output=True, timeout=10,
         )
         self.assertEqual(list(self.output.glob(".make-deps.*")), [],
                          "temporary staging was left behind")
         return result
+
+    def test_every_app_resolves_release_modules_without_a_workspace(self):
+        script = '''
+[ "$GOWORK" = off ] || { echo 'Development workspace reached Go' >&2; exit 1; }
+[ "$GOTOOLCHAIN" = local ] || exit 1
+mkdir -p "$GOMODCACHE" || exit 1
+printf '%s\\n' "$2" > "$GOMODCACHE/$2" || exit 1
+'''
+        for app in ("imvault", "witmoot", "songstead"):
+            for workspace in ("auto", str(self.work / "unpublished sibling/go.work")):
+                with self.subTest(app=app, workspace=workspace):
+                    self.target = self.output / f"{app}-1.2.3-deps.tar.xz"
+                    result = self.run_bundle(script, app=app, workspace=workspace)
+                    self.assertEqual(result.returncode, 0, result.stderr.decode())
+                    with tarfile.open(self.target, "r:xz") as tar:
+                        self.assertEqual(tar.extractfile("go-mod/download").read(), b"download\n")
+                        self.assertEqual(tar.extractfile("go-mod/verify").read(), b"verify\n")
+                    self.target.unlink()
+        helper = self.work / "mutated-make-deps.sh"
+        original = (ROOT / "scripts/make-deps.sh").read_text()
+        mutated = original.replace("export GOWORK=off\n", "")
+        self.assertNotEqual(original, mutated)
+        helper.write_text(mutated)
+        result = self.run_bundle(script, helper=helper)
+        self.assertNotEqual(result.returncode, 0, "Workspace isolation mutation survived")
+        self.assertIn(b"Development workspace reached Go", result.stderr)
+        self.assertEqual(list(self.output.iterdir()), [])
 
     def test_publication_does_not_replace_a_concurrent_output(self):
         result = self.run_bundle('''

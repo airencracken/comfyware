@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-APPS = ("imvault", "witmoot")
+APPS = ("imvault", "witmoot", "songstead")
 VERSION = re.compile(r"^(\d+\.\d+\.\d+)(-r\d+)?$")
 
 
@@ -328,13 +328,14 @@ class TrustedProxyRename(unittest.TestCase):
 def write_fixture(source, app, bin_default):
     """Create the contrib files src_install reads, shaped like upstream's."""
     upper = app.upper()
+    command = " serve" if app == "songstead" else ""
     files = {
         f"contrib/openrc/{app}": f'#!/sbin/openrc-run\n: "${{{upper}_BIN:={bin_default}}}"\n'
                                  f'command="${{{upper}_BIN}}"\n',
         f"contrib/openrc/{app}.confd": f"# {upper}_ADDR=127.0.0.1:8080\n",
         f"contrib/logrotate/{app}": f"/var/log/{app}.log {{\n\tweekly\n}}\n",
         f"contrib/systemd/{app}.service": "[Service]\nStandardOutput=journal\nStandardError=journal\n"
-                                          f"SyslogIdentifier={app}\nExecStart=/usr/local/bin/{app}\n",
+                                          f"SyslogIdentifier={app}\nExecStart=/usr/local/bin/{app}{command}\n",
         f"contrib/systemd/{app}.env": f"# {upper}_ADDR=127.0.0.1:8080\n",
     }
     if app == "imvault":
@@ -364,7 +365,8 @@ class StagedInstallCheck(unittest.TestCase):
                                   capture_output=True, text=True, timeout=30)
 
     def test_current_recipes_pass(self):
-        for app, default in (("imvault", "/usr/bin/imvault"), ("witmoot", "/usr/local/bin/witmoot")):
+        for app, default in (("imvault", "/usr/bin/imvault"), ("witmoot", "/usr/local/bin/witmoot"),
+                             ("songstead", "/usr/local/bin/songstead")):
             for recipe in (release_recipes(app)[-1], ROOT / "www-apps" / app / f"{app}-9999.ebuild"):
                 with self.subTest(recipe=recipe.name):
                     result = self.run_check(app, recipe.read_text(), default)

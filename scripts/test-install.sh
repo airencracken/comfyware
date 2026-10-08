@@ -6,16 +6,18 @@ fail() { printf '%s\n' "$*" >&2; exit 1; }
 [[ $# == 2 ]] || fail 'Usage: test-install.sh EBUILD SOURCE_DIRECTORY'
 ebuild=$(realpath "$1") || exit 1
 source_dir=$(realpath "$2") || exit 1
-PN=$(basename "$(dirname "$ebuild")")
+PF=$(basename "$ebuild" .ebuild)
+# Staged release recipes live outside www-apps, so use the recipe's filename.
+PN=${PF%%-[0-9]*}
 case "$PN" in imvault|witmoot|songstead) ;; *) fail 'Expected an imvault, witmoot or songstead ebuild.' ;; esac
 # The sourced ebuild reads these Portage variables.
 # shellcheck disable=SC2034
 {
-	PF=$(basename "$ebuild" .ebuild)
 	PVR=${PF#"$PN"-}
 	PV=${PVR%-r[0-9]*}
 	P=$PN-$PV
 }
+[[ $PVR =~ ^([0-9]+\.[0-9]+\.[0-9]+(-r[0-9]+)?|9999)$ ]] || fail 'Invalid ebuild version.'
 work=$(mktemp -d) || exit 1
 trap 'rm -rf "$work"' EXIT
 trap 'exit 129' HUP
@@ -71,6 +73,7 @@ initd="$ED/etc/init.d/$PN"
 grep -q '/usr/local/bin' "$initd" && fail 'OpenRC service still refers to /usr/local/bin.'
 grep -Eq "^: \"\\\$\{[A-Z]+_BIN:=/usr/bin/$PN\}\"$" "$initd" || fail 'OpenRC service does not default to /usr/bin.'
 [[ -x $ED/usr/bin/$PN ]] || fail 'Executable is missing from /usr/bin.'
+[[ -d $ED/var/lib/$PN && $(stat -c %a "$ED/var/lib/$PN") == 700 ]] || fail 'Application data directory must be mode 0700.'
 env_file="$ED/etc/$PN/$PN.env"
 [[ -s $env_file ]] || fail 'systemd environment file is missing.'
 case $(stat -c %a "$env_file") in

@@ -29,7 +29,7 @@ jobs:
       - name: Check recipes and dependency bundle tooling
         run: |
           bash scripts/test-make-deps.sh || exit 1
-          for test in publication manifests recipes sandbox-packaging github-funding; do
+          for test in publication manifests recipes sandbox-packaging github-funding songstead companion-preparation; do
             python3 "scripts/test-$test.py" || exit 1
           done
           python3 scripts/verify-distfile.py || exit 1
@@ -39,7 +39,7 @@ jobs:
         run: |
           work=$(mktemp -d) || exit 1
           trap 'rm -rf "$work"' EXIT
-          for app in imvault witmoot; do
+          for app in imvault witmoot songstead; do
             newest=
             for ebuild in www-apps/"$app"/"$app"-*.ebuild; do
               version=${ebuild##*/}

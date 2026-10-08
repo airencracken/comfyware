@@ -38,7 +38,7 @@ class ManifestTests(unittest.TestCase):
                          "A root directory would be treated as an unknown package category")
 
     def test_release_recipes_have_exact_distfiles(self):
-        for app in ("imvault", "witmoot"):
+        for app in ("imvault", "witmoot", "songstead"):
             with self.subTest(app=app):
                 package = ROOT / "www-apps" / app
                 expected = set()

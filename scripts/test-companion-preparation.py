@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Check proposed integration releases without enabling unpublished distfiles."""
+"""Check coordinated release recipes before and after activation."""
 from pathlib import Path
 import importlib.util
 import subprocess
@@ -16,23 +16,33 @@ class CompanionPreparation(unittest.TestCase):
         for app, version in (("witmoot", "0.14.0"), ("imvault", "0.16.0")):
             with self.subTest(app=app):
                 staged = ROOT / "release-preparation" / f"{app}-{version}.ebuild"
-                text = staged.read_text()
+                active = ROOT / "www-apps" / app / staged.name
+                candidate = active if active.exists() else staged
+                text = candidate.read_text()
                 live = (ROOT / "www-apps" / app / f"{app}-9999.ebuild").read_text()
                 self.assertEqual(recipes.recipe_errors(text), [])
                 self.assertEqual(recipes.live_equivalent(text, app), live)
-                args = recipes.compile_arguments(staged, app, version)
+                args = recipes.compile_arguments(candidate, app, version)
                 recipes.validate_compiled_version(args, version)
-                subprocess.run(["bash", "-n", str(staged)], check=True)
+                subprocess.run(["bash", "-n", str(candidate)], check=True)
 
-    def test_unpublished_recipes_have_no_active_package_or_manifest_claim(self):
+    def test_activation_matches_manifest_claims(self):
         for app, version in (("witmoot", "0.14.0"), ("imvault", "0.16.0")):
             package = ROOT / "www-apps" / app
-            self.assertFalse((package / f"{app}-{version}.ebuild").exists())
-            self.assertNotIn(f"{app}_{version}_source.tar.gz", (package / "Manifest").read_text())
-            self.assertNotIn(f"{app}-{version}-deps.tar.xz", (package / "Manifest").read_text())
+            active = package / f"{app}-{version}.ebuild"
+            manifest = (package / "Manifest").read_text()
+            if active.exists():
+                self.assertFalse((ROOT / "release-preparation" / active.name).exists())
+                self.assertIn(f"DIST {app}_{version}_source.tar.gz ", manifest)
+                self.assertIn(f"DIST {app}-{version}-deps.tar.xz ", manifest)
+            else:
+                self.assertNotIn(f"{app}_{version}_source.tar.gz", manifest)
+                self.assertNotIn(f"{app}-{version}-deps.tar.xz", manifest)
 
     def test_wrong_build_stamp_is_rejected(self):
-        args = recipes.compile_arguments(ROOT / "release-preparation/witmoot-0.14.0.ebuild", "witmoot", "0.14.0")
+        active = ROOT / "www-apps/witmoot/witmoot-0.14.0.ebuild"
+        candidate = active if active.exists() else ROOT / "release-preparation/witmoot-0.14.0.ebuild"
+        args = recipes.compile_arguments(candidate, "witmoot", "0.14.0")
         with self.assertRaises(ValueError):
             recipes.validate_compiled_version(args, "0.13.0")
 

@@ -33,7 +33,7 @@ RDEPEND="
 # rather than replacing the eclass's line, which carries the slot operator and a
 # packaging workaround of its own.
 BDEPEND+="
-	>=dev-lang/go-1.26
+	>=dev-lang/go-1.26.0
 	acct-group/imvault
 	acct-user/imvault
 "
