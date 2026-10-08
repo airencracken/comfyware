@@ -30,7 +30,7 @@ def validate_manifest(lines, expected):
 
 class ManifestTests(unittest.TestCase):
     def test_tracked_directories_are_categories_or_repository_infrastructure(self):
-        allowed = {"metadata", "profiles", "scripts"}
+        allowed = {"metadata", "profiles", "scripts", "release-preparation"}
         allowed.update(path.parent.parent.name for path in ROOT.glob("*/*/metadata.xml"))
         paths = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
         directories = {path.split("/", 1)[0] for path in paths if "/" in path and not path.startswith(".")}

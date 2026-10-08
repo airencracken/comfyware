@@ -7,7 +7,7 @@ fail() { printf '%s\n' "$*" >&2; exit 1; }
 ebuild=$(realpath "$1") || exit 1
 source_dir=$(realpath "$2") || exit 1
 PN=$(basename "$(dirname "$ebuild")")
-case "$PN" in imvault|witmoot) ;; *) fail 'Expected an imvault or witmoot ebuild.' ;; esac
+case "$PN" in imvault|witmoot|songstead) ;; *) fail 'Expected an imvault, witmoot or songstead ebuild.' ;; esac
 # The sourced ebuild reads these Portage variables.
 # shellcheck disable=SC2034
 {
@@ -79,7 +79,11 @@ case $(stat -c %a "$env_file") in
 esac
 grep -qx "/usr/share/doc/$PF/examples" "$work/docompress-skip" 2>/dev/null || fail 'Proxy examples would be installed compressed.'
 unit="$ED/usr/lib/systemd/system/$PN.service"
+if [[ $PN == songstead ]]; then
+ grep -qx 'ExecStart=/usr/bin/songstead serve' "$unit" || fail 'Songstead systemd command is incorrect.'
+else
 grep -Eq "^ExecStart=(\"/usr/bin/$PN\"|/usr/bin/$PN)$" "$unit" || fail 'systemd executable is not under /usr/bin.'
+fi
 for setting in StandardOutput=journal StandardError=journal "SyslogIdentifier=$PN"; do
 	grep -qx "$setting" "$unit" || fail "Packaged systemd unit is missing $setting."
 done

@@ -1,15 +1,16 @@
 # comfyware
 
-Gentoo packages for Imvault and Witmoot: apps you can host for friends, family,
+Gentoo packages for Imvault, Witmoot and Songstead: apps you can host for friends, family,
 and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
 | `www-apps/imvault` | `0.15.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/songstead` | `0.1.0` preparation / live `9999` | A quiet music recommendation inbox; upstream publication pending |
 | `www-apps/witmoot` | `0.13.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
-bundles; compilation does not need network access. Both also have **live `9999`
+bundles; compilation does not need network access. The released apps also have **live `9999`
 ebuilds** that build upstream `master` and fetch dependencies during unpack.
 Go 1.26 or newer is required and pulled in by Portage.
 
@@ -229,3 +230,24 @@ Each application's ebuild records its own and its linked dependencies' licenses.
 To check the funding links GitHub recognizes and the public repository sidebars,
 run `python3 scripts/test-github-funding.py --live` with an authenticated `gh`.
 Both a funding file and an enabled Sponsorships setting are required.
+
+## Songstead 0.1.0 preparation
+
+The live package builds upstream `master`, with Go 1.26, SQLite and HTMX.
+It becomes usable after the Songstead repository and Comfylib v0.1.1 are published.
+The versioned recipe is staged at `release-preparation/songstead-0.1.0.ebuild`;
+it is deliberately outside Portage's package directory until its two real
+distfiles exist. Do not invent Manifest hashes or enable it before publication.
+
+After upstream v0.1.0 is published, download its source archive, run
+`scripts/make-deps.sh songstead 0.1.0 SOURCE.tar.gz OUTPUT_DIRECTORY`, verify
+the source/dependency archives, and publish the dependency bundle under the
+overlay release tag `songstead-0.1.0`. Move the staged recipe into
+`www-apps/songstead`, generate the BLAKE2B/SHA512 Manifest with Portage, and
+run recipe, Manifest and staged installation checks before pushing.
+
+Native services bind `127.0.0.1:8083`; configuration lives in
+`/etc/conf.d/songstead` or `/etc/songstead/songstead.env`. Accounts are
+provisioned with `songstead create-user --username NAME --password-stdin`.
+Use a private input file or pipe and run as the songstead service account.
+Back up `/var/lib/songstead` before upgrades; startup applies forward migrations.

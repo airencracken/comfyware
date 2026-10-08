@@ -5,7 +5,7 @@ fail() { printf '%s\n' "$*" >&2; exit 1; }
 [[ $# == 4 ]] || fail 'Usage: make-deps.sh APP VERSION SOURCE.tar.gz OUTPUT_DIRECTORY'
 app=$1
 version=$2
-case "$app" in imvault|witmoot) ;; *) fail 'Choose imvault or witmoot.' ;; esac
+case "$app" in imvault|witmoot|songstead) ;; *) fail 'Choose imvault, witmoot or songstead.' ;; esac
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || fail 'Version must have the form X.Y.Z.'
 source_archive=$(realpath "$3") || exit 1
 mkdir -p "$4" || exit 1

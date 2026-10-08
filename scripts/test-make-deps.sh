@@ -16,7 +16,7 @@ expect_failure() {
 	fi
 	grep -Fq "$message" "$work/result" || { cat "$work/result" >&2; exit 1; }
 }
-expect_failure 'Choose imvault or witmoot.' unknown 0.1.0 "$work/source.tar.gz" "$work/output"
+expect_failure 'Choose imvault, witmoot or songstead.' unknown 0.1.0 "$work/source.tar.gz" "$work/output"
 expect_failure 'Version must have the form X.Y.Z.' imvault '../../escape' "$work/source.tar.gz" "$work/output"
 [[ ! -e $work/output ]] || fail 'Invalid arguments created an output directory.'
 mkdir -p "$work/source" "$work/output" "$work/bin" || exit 1
