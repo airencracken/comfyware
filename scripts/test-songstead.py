@@ -11,9 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("recipes", ROOT / "scripts/test-recipes.py")
 recipes = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(recipes)
-STAGED = ROOT / "release-preparation/songstead-0.1.0.ebuild"
+STAGED = ROOT / "release-preparation/songstead-0.1.1.ebuild"
 LIVE = ROOT / "www-apps/songstead/songstead-9999.ebuild"
-ACTIVE = LIVE.parent / "songstead-0.1.0.ebuild"
+ACTIVE = LIVE.parent / "songstead-0.1.1.ebuild"
 RELEASE = ACTIVE if ACTIVE.exists() else STAGED
 
 
@@ -25,14 +25,14 @@ class SongsteadRecipes(unittest.TestCase):
         self.assertEqual(recipes.live_equivalent(release, "songstead"), live)
         self.assertIn('EGIT_BRANCH="master"', live)
         self.assertIn('LICENSE="AGPL-3+', live)
-        self.assertNotIn("sandbox", live)
+        self.assertIn("bubblewrap? ( >=sys-apps/bubblewrap-0.8[-suid(-)] )", live)
         self.assertIn("acct-user/songstead", live)
 
     def test_release_state_has_exact_manifest_entries(self):
         if ACTIVE.exists():
             self.assertFalse(STAGED.exists(), "Published recipe is still staged")
             entries = (LIVE.parent / "Manifest").read_text().splitlines()
-            expected = {"songstead_0.1.0_source.tar.gz", "songstead-0.1.0-deps.tar.xz"}
+            expected = {"songstead_0.1.0_source.tar.gz", "songstead-0.1.0-deps.tar.xz", "songstead_0.1.1_source.tar.gz", "songstead-0.1.1-deps.tar.xz"}
             spec = importlib.util.spec_from_file_location("manifests", ROOT / "scripts/test-manifests.py")
             manifests = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(manifests)
@@ -42,7 +42,7 @@ class SongsteadRecipes(unittest.TestCase):
             self.assertFalse((LIVE.parent / "Manifest").exists())
 
     def test_compile_version_and_accounts(self):
-        for recipe, version in ((RELEASE, "0.1.0"), (LIVE, "9999")):
+        for recipe, version in ((RELEASE, "0.1.1"), (LIVE, "9999")):
             args = recipes.compile_arguments(recipe, "songstead", version)
             recipes.validate_compiled_version(args, version)
             self.assertEqual(args[-1], "./cmd/songstead")
@@ -80,6 +80,7 @@ class SongsteadRecipes(unittest.TestCase):
             "world-readable": text.replace("fperms 0600 /etc/songstead/songstead.env", "fperms 0644 /etc/songstead/songstead.env"),
             "OpenRC service still": text.replace("contrib/openrc/songstead >", "contrib/openrc/songstead | sed 's|/usr/bin|/usr/local/bin|' >"),
             "systemd command": text.replace("contrib/systemd/songstead.service >", "contrib/systemd/songstead.service | sed 's| serve||' >"),
+            "sandbox drop-in": text.replace('dodoc "${T}/songstead-sandbox.conf"', ": # missing sandbox drop-in"),
             "logrotate": text.replace("newins contrib/logrotate/songstead songstead", ": # missing logrotate"),
             "compressed": text.replace('docompress -x "/usr/share/doc/${PF}/examples"', ": # compressed examples"),
         }
@@ -91,7 +92,7 @@ class SongsteadRecipes(unittest.TestCase):
                 self.assertIn(error, result.stderr)
 
     def test_invalid_recipe_names_fail_before_installation(self):
-        for name in ("songstead-0.1.0-injected.ebuild", "songstead-0.1.ebuild", "unknown-0.1.0.ebuild"):
+        for name in ("songstead-0.1.1-injected.ebuild", "songstead-0.1.ebuild", "unknown-0.1.0.ebuild"):
             with self.subTest(name=name):
                 result = self.run_install(RELEASE.read_text(), name)
                 self.assertNotEqual(result.returncode, 0)

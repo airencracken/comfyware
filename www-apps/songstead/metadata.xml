@@ -5,6 +5,9 @@
 		<email>airencracken@users.noreply.github.com</email>
 		<name>Marcus J. Hildum</name>
 	</maintainer>
+	<use>
+		<flag name="bubblewrap">Install Bubblewrap for optional whole-service isolation</flag>
+	</use>
 	<upstream>
 		<remote-id type="github">airencracken/songstead</remote-id>
 	</upstream>

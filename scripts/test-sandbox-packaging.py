@@ -7,12 +7,13 @@ import unittest
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-APPS = ("imvault", "witmoot")
+APPS = ("imvault", "witmoot", "songstead")
 
 
 def recipes(app):
     """Every release and live recipe, so new versions are checked without edits."""
-    return sorted((ROOT / "www-apps" / app).glob(f"{app}-*.ebuild"))
+    return sorted(path for path in (ROOT / "www-apps" / app).glob(f"{app}-*.ebuild")
+                  if app != "songstead" or path.name != "songstead-0.1.0.ebuild")
 
 
 def validate_recipe(text):

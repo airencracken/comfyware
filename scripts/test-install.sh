@@ -36,7 +36,12 @@ chmod 0755 "$PN" || exit 1
 die() { fail "src_install failed${1:+: $*}"; }
 inherit() { :; }
 einstalldocs() { :; }
-dodoc() { :; }
+dodoc() {
+	if [[ $PN == songstead && "$*" == *songstead-sandbox.conf* ]]; then
+		grep -qx 'ExecStart=/usr/bin/songstead sandbox' "$1" || die 'Sandbox drop-in executable is incorrect.'
+		printf 'sandbox drop-in\n' > "$work/sandbox-dropin" || die
+	fi
+}
 docinto() { :; }
 docompress() {
 	[[ $1 == -x ]] || die 'docompress without -x is unexpected here'
@@ -63,6 +68,9 @@ if [[ " ${IUSE:-} " == *" bubblewrap "* ]]; then
 	[[ " $RDEPEND " == *'bubblewrap? ( >=sys-apps/bubblewrap-0.8[-suid(-)] )'* ]] || fail 'Optional Bubblewrap dependency must be at least 0.8 and reject setuid builds.'
 fi
 src_install || fail "$PF src_install failed."
+if [[ $PN == songstead && " ${IUSE:-} " == *" bubblewrap "* ]]; then
+	[[ -e $work/sandbox-dropin ]] || fail 'Songstead sandbox drop-in is missing.'
+fi
 cmp contrib/logrotate/"$PN" "$ED/etc/logrotate.d/$PN" || fail 'Packaged logrotate rule is missing or altered.'
 [[ $(stat -c %a "$ED/etc/logrotate.d/$PN") == 644 ]] || fail 'Logrotate rule is not mode 0644.'
 [[ -x $ED/etc/init.d/$PN && -s $ED/etc/conf.d/$PN ]] || fail 'OpenRC service or settings are missing.'

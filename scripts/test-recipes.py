@@ -338,6 +338,8 @@ def write_fixture(source, app, bin_default):
                                           f"SyslogIdentifier={app}\nExecStart=/usr/local/bin/{app}{command}\n",
         f"contrib/systemd/{app}.env": f"# {upper}_ADDR=127.0.0.1:8080\n",
     }
+    if app == "songstead":
+        files["contrib/systemd/songstead-sandbox.conf"] = "[Service]\nExecStart=\nExecStart=/usr/local/bin/songstead sandbox\n"
     if app == "imvault":
         files.update({
             "contrib/systemd/imvault-backup.service": "[Service]\nExecStart=/usr/local/bin/imvault backup --output-dir /var/backups/imvault --keep 7\n",
