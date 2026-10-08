@@ -6,7 +6,7 @@ and small communities.
 | Package | Release | What it does |
 | --- | --- | --- |
 | `www-apps/imvault` | `0.15.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/songstead` | `0.1.0` preparation / live `9999` | A quiet music recommendation inbox; upstream publication pending |
+| `www-apps/songstead` | `0.1.0` preparation / live `9999` | A quiet music recommendation shelf; upstream publication pending |
 | `www-apps/witmoot` | `0.13.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -251,3 +251,14 @@ Native services bind `127.0.0.1:8083`; configuration lives in
 provisioned with `songstead create-user --username NAME --password-stdin`.
 Use a private input file or pipe and run as the songstead service account.
 Back up `/var/lib/songstead` before upgrades; startup applies forward migrations.
+
+The coordinated integration release also prepares Witmoot `0.14.0` and Imvault
+`0.16.0` recipes in `release-preparation`, based on the inspected `0.13.0` and
+`0.15.0` recipes. These proposed versions need remote tag verification, full
+upstream release checks, real source/dependency releases and Manifest entries
+before activation. They are not installable versioned packages yet. The new
+source carries Witmoot's explicit discussion drafts and Imvault's album
+discussion links and permission-checked previews; current stable recipes remain
+available while this work is prepared. Run
+`python3 scripts/test-companion-preparation.py` to check recipe parity and
+compile versions before activating them.

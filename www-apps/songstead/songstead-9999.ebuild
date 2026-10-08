@@ -6,7 +6,7 @@ EAPI=8
 
 inherit git-r3 go-module systemd
 
-DESCRIPTION="A quiet music recommendation inbox for friends and family"
+DESCRIPTION="A quiet music recommendation shelf for friends and family"
 HOMEPAGE="https://github.com/airencracken/songstead"
 EGIT_REPO_URI="https://github.com/airencracken/songstead.git"
 EGIT_BRANCH="master"

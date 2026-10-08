@@ -5,7 +5,7 @@ EAPI=8
 
 inherit go-module systemd
 
-DESCRIPTION="A quiet music recommendation inbox for friends and family"
+DESCRIPTION="A quiet music recommendation shelf for friends and family"
 HOMEPAGE="https://github.com/airencracken/songstead"
 SRC_URI="
 	https://github.com/airencracken/songstead/releases/download/v${PV}/${PN}_${PV}_source.tar.gz
