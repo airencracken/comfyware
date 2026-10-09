@@ -6,7 +6,7 @@ and small communities.
 | Package | Release | What it does |
 | --- | --- | --- |
 | `www-apps/imvault` | `0.16.2` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/songstead` | `0.4.0` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
+| `www-apps/songstead` | `0.4.1` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
 | `www-apps/witmoot` | `0.14.2` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -113,7 +113,7 @@ are supported by Imvault and Witmoot too. Each app installs proxy examples under
 
 - [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.16.2/docs/deployment.md)
 - [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.14.2/docs/deployment.md)
-- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.4.0/docs/deployment.md)
+- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.4.1/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
 and service paths. Generate a site configuration for your hostname with:
@@ -165,7 +165,7 @@ then restart the affected service.
 Read each application's release notes before upgrading:
 [Imvault](https://github.com/airencracken/imvault/tree/master/docs/release-notes)
 [Witmoot](https://github.com/airencracken/witmoot/tree/master/docs/release-notes),
-and [Songstead](https://github.com/airencracken/songstead/blob/v0.4.0/CHANGELOG.md).
+and [Songstead](https://github.com/airencracken/songstead/blob/v0.4.1/CHANGELOG.md).
 Witmoot schema upgrades cannot be undone, so back up the entire stopped data
 directory first. Keep all OpenRC configuration files at mode 0600; they can
 contain SMTP credentials. The [September 2026 audit](AUDIT-2026-09-29.md)
@@ -231,7 +231,7 @@ bash scripts/make-deps.sh imvault 0.16.2 imvault_0.16.2_source.tar.gz /tmp/comfy
 The helper verifies modules and refuses to overwrite an existing bundle.
 It disables Go workspaces so a sibling development checkout cannot supply
 unpublished dependencies in place of the release's modules.
-Publish the bundle under the matching `imvault-0.16.2`, `witmoot-0.14.2`, or `songstead-0.4.0` tag in this
+Publish the bundle under the matching `imvault-0.16.2`, `witmoot-0.14.2`, or `songstead-0.4.1` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
@@ -245,7 +245,7 @@ Both a funding file and an enabled Sponsorships setting are required.
 
 ## Songstead and discussion links
 
-Songstead 0.4.0 is available as a versioned package and a live build. Its native
+Songstead 0.4.1 is available as a versioned package and a live build. Its native
 service binds `127.0.0.1:8083`; configure your hostname, secure cookies and a
 reverse proxy in `/etc/conf.d/songstead` or `/etc/songstead/songstead.env`.
 Provision an owner with `songstead create-owner --username NAME --password-prompt`.
@@ -254,8 +254,8 @@ For scripts, use `--password-stdin` with protected standard input instead. Accou
 commands discover the installed service configuration and root invocations run
 as the configured service user. Restart the updated server before provisioning
 on an existing instance. Back up `/var/lib/songstead` before upgrades; startup applies
-forward migrations. Follow the [installation guide](https://github.com/airencracken/songstead/blob/v0.4.0/docs/releases.md)
-and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.4.0/docs/deployment.md)
+forward migrations. Follow the [installation guide](https://github.com/airencracken/songstead/blob/v0.4.1/docs/releases.md)
+and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.4.1/docs/deployment.md)
 for accounts, service settings and Caddy.
 
 Witmoot 0.14.2 accepts explicit discussion drafts from Songstead recommendations
@@ -275,7 +275,7 @@ checking release/live parity, version stamps and exact Manifest entries.
 Songstead also supports the optional `bubblewrap` USE flag. Enable its launcher
 with `SONGSTEAD_SANDBOX="true"` in OpenRC, or install the systemd drop-in from
 `examples/systemd/songstead-sandbox.conf`. Run `songstead sandbox --check` as the
-service user before restarting. See [Songstead sandbox setup](https://github.com/airencracken/songstead/blob/v0.4.0/docs/sandbox.md).
+service user before restarting. See [Songstead sandbox setup](https://github.com/airencracken/songstead/blob/v0.4.1/docs/sandbox.md).
 
 Songstead includes browser administration, invitations and account recovery.
 After upgrading and restarting, sign in as an owner and open Admin. For a
@@ -286,10 +286,11 @@ private music access rules as members. Imvault 0.16.2 and Witmoot 0.14.2 share
 Comfylib 0.1.3 password confirmation and image normalization, without schema
 changes to either companion.
 
-Songstead 0.4.0 includes freeform genre and tags, private discovery preferences,
-optional artwork tiles and supported-link previews before sharing. Layout switches
-apply immediately; compact genre/tag pickers keep the main controls small.
-Account exposes spoiler settings, exclusions/favorites and profile pictures with
+Songstead 0.4.1 includes freeform genre and tags, private discovery preferences,
+compact List thumbnails, optional artwork tiles and supported-link previews before
+sharing. View and discovery switches apply immediately; genre/tag pickers sit
+beneath them, with additional dropdowns under More filters.
+Your settings exposes spoiler settings, exclusions/favorites and profile pictures with
 a viewer setting for GIF animation. Listening feedback shows a saved confirmation.
 Labels follow each recommendation's audience; preferences and listening feedback
 remain private. Public sharing cards show instance branding.
