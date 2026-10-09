@@ -11,9 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("recipes", ROOT / "scripts/test-recipes.py")
 recipes = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(recipes)
-STAGED = ROOT / "release-preparation/songstead-0.4.1.ebuild"
+STAGED = ROOT / "release-preparation/songstead-0.5.0.ebuild"
 LIVE = ROOT / "www-apps/songstead/songstead-9999.ebuild"
-ACTIVE = LIVE.parent / "songstead-0.4.1.ebuild"
+ACTIVE = LIVE.parent / "songstead-0.5.0.ebuild"
 RELEASE = ACTIVE if ACTIVE.exists() else STAGED
 
 
@@ -32,7 +32,7 @@ class SongsteadRecipes(unittest.TestCase):
         if ACTIVE.exists():
             self.assertFalse(STAGED.exists(), "Published recipe is still staged")
             entries = (LIVE.parent / "Manifest").read_text().splitlines()
-            expected = {"songstead_0.1.0_source.tar.gz", "songstead-0.1.0-deps.tar.xz", "songstead_0.1.1_source.tar.gz", "songstead-0.1.1-deps.tar.xz", "songstead_0.1.2_source.tar.gz", "songstead-0.1.2-deps.tar.xz", "songstead_0.2.1_source.tar.gz", "songstead-0.2.1-deps.tar.xz", "songstead_0.3.1_source.tar.gz", "songstead-0.3.1-deps.tar.xz", "songstead_0.4.0_source.tar.gz", "songstead-0.4.0-deps.tar.xz", "songstead_0.4.1_source.tar.gz", "songstead-0.4.1-deps.tar.xz"}
+            expected = {"songstead_0.1.0_source.tar.gz", "songstead-0.1.0-deps.tar.xz", "songstead_0.1.1_source.tar.gz", "songstead-0.1.1-deps.tar.xz", "songstead_0.1.2_source.tar.gz", "songstead-0.1.2-deps.tar.xz", "songstead_0.2.1_source.tar.gz", "songstead-0.2.1-deps.tar.xz", "songstead_0.3.1_source.tar.gz", "songstead-0.3.1-deps.tar.xz", "songstead_0.4.0_source.tar.gz", "songstead-0.4.0-deps.tar.xz", "songstead_0.4.1_source.tar.gz", "songstead-0.4.1-deps.tar.xz", "songstead_0.5.0_source.tar.gz", "songstead-0.5.0-deps.tar.xz"}
             spec = importlib.util.spec_from_file_location("manifests", ROOT / "scripts/test-manifests.py")
             manifests = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(manifests)
@@ -42,7 +42,7 @@ class SongsteadRecipes(unittest.TestCase):
             self.assertFalse((LIVE.parent / "Manifest").exists())
 
     def test_compile_version_and_accounts(self):
-        for recipe, version in ((RELEASE, "0.4.1"), (LIVE, "9999")):
+        for recipe, version in ((RELEASE, "0.5.0"), (LIVE, "9999")):
             args = recipes.compile_arguments(recipe, "songstead", version)
             recipes.validate_compiled_version(args, version)
             self.assertEqual(args[-1], "./cmd/songstead")
