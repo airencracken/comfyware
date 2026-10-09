@@ -7,7 +7,7 @@ and small communities.
 | --- | --- | --- |
 | `www-apps/imvault` | `0.16.2` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/songstead` | `0.5.0` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
-| `www-apps/witmoot` | `0.14.2` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/witmoot` | `0.15.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. The released apps also have **live `9999`
@@ -79,7 +79,7 @@ For optional Bubblewrap confinement in Imvault and Witmoot, add `bubblewrap`
 to their USE flags. This installs a non-setuid launcher; enable confinement separately
 in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
 See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.16.2/docs/sandbox.md)
-or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.14.2/docs/sandbox.md)
+or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.15.0/docs/sandbox.md)
 for OpenRC settings, systemd overrides and verification.
 
 Install the applications you want:
@@ -109,10 +109,10 @@ are supported by Imvault and Witmoot too. Each app installs proxy examples under
 `/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
 - [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.16.2/docs/reverse-proxies.md)
-- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.14.2/docs/reverse-proxies.md)
+- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.15.0/docs/reverse-proxies.md)
 
 - [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.16.2/docs/deployment.md)
-- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.14.2/docs/deployment.md)
+- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.15.0/docs/deployment.md)
 - [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.5.0/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
@@ -231,7 +231,7 @@ bash scripts/make-deps.sh imvault 0.16.2 imvault_0.16.2_source.tar.gz /tmp/comfy
 The helper verifies modules and refuses to overwrite an existing bundle.
 It disables Go workspaces so a sibling development checkout cannot supply
 unpublished dependencies in place of the release's modules.
-Publish the bundle under the matching `imvault-0.16.2`, `witmoot-0.14.2`, or `songstead-0.5.0` tag in this
+Publish the bundle under the matching `imvault-0.16.2`, `witmoot-0.15.0`, or `songstead-0.5.0` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
@@ -258,13 +258,14 @@ forward migrations. Follow the [installation guide](https://github.com/airencrac
 and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.5.0/docs/deployment.md)
 for accounts, service settings and Caddy.
 
-Witmoot 0.14.2 accepts explicit discussion drafts from Songstead recommendations
+Witmoot 0.15.0 accepts explicit discussion drafts from Songstead recommendations
 and Imvault albums. Imvault 0.16.2 adds album discussion links and previews that
 check current public visibility. Each app keeps its own accounts and data.
 Opening a draft creates no thread; choose a board or existing topic, review its
 audience, then post. Private albums retain plain links without metadata previews.
 Configure the optional connections using the deployment guides before enabling
-them. The three packages use the published Comfylib 0.1.3 module.
+them. Songstead 0.5.0 and Witmoot 0.15.0 pin published Comfylib 0.1.4;
+Imvault 0.16.2 pins Comfylib 0.1.3.
 
 The installation checks stage files without creating accounts or starting
 services. They verify executable paths, private data/configuration permissions,
@@ -282,9 +283,9 @@ After upgrading and restarting, sign in as an owner and open Admin. For a
 previously provisioned member, `songstead set-role --username NAME --role owner`
 explicitly enables administration. Configure the public Songstead and Witmoot
 addresses in Instance settings; changes apply immediately. Owners keep the same
-private music access rules as members. Imvault 0.16.2 and Witmoot 0.14.2 share
-Comfylib 0.1.3 password confirmation and image normalization, without schema
-changes to either companion.
+private music access rules as members. Imvault 0.16.2 and Witmoot 0.15.0 use
+Comfylib's shared password confirmation and branding image normalization. Each
+application retains its own account and invitation policies.
 
 Songstead 0.5.0 includes freeform genre and tags, private discovery preferences,
 compact List thumbnails, optional artwork tiles and supported-link previews before
@@ -297,10 +298,16 @@ remain private. Public sharing cards show instance branding.
 
 Startup applies schema 7 and retries existing missing artwork while retaining
 cached images; back up before upgrading. Comfylib 0.1.4 supplies bounded profile
-images and the shared artwork normalization. Companion versions remain unchanged.
+images and the shared artwork normalization. Witmoot uses the same profile image
+handling for the avatar upgrade below.
 
 Owners choose Songstead, Witmoot or Both under Admin's Discussion location.
 Songstead and Both allow local participation without a Witmoot account. Witmoot
 requires each person's separate account; no API key is needed for the browser
 draft handoff. Existing comments remain readable, and configured connections
 retain Both on upgrade. This release keeps schema 7 and Comfylib 0.1.4.
+
+Witmoot 0.15.0 retains animated GIF avatars through Comfylib 0.1.4. Members
+can upload or remove an avatar under Your account and save whether they see
+animation. Device reduced-motion preferences and visitors receive still images.
+Stop the service and back up its data directory before the schema 18 upgrade.
