@@ -13,7 +13,7 @@ spec.loader.exec_module(recipes)
 
 class CompanionPreparation(unittest.TestCase):
     def test_recipes_match_live_services_and_compile_versions(self):
-        for app, version in (("witmoot", "0.14.0"), ("imvault", "0.16.0")):
+        for app, version in (("witmoot", "0.14.2"), ("imvault", "0.16.2")):
             with self.subTest(app=app):
                 staged = ROOT / "release-preparation" / f"{app}-{version}.ebuild"
                 active = ROOT / "www-apps" / app / staged.name
@@ -27,7 +27,7 @@ class CompanionPreparation(unittest.TestCase):
                 subprocess.run(["bash", "-n", str(candidate)], check=True)
 
     def test_activation_matches_manifest_claims(self):
-        for app, version in (("witmoot", "0.14.0"), ("imvault", "0.16.0")):
+        for app, version in (("witmoot", "0.14.2"), ("imvault", "0.16.2")):
             package = ROOT / "www-apps" / app
             active = package / f"{app}-{version}.ebuild"
             manifest = (package / "Manifest").read_text()
@@ -40,9 +40,9 @@ class CompanionPreparation(unittest.TestCase):
                 self.assertNotIn(f"{app}-{version}-deps.tar.xz", manifest)
 
     def test_wrong_build_stamp_is_rejected(self):
-        active = ROOT / "www-apps/witmoot/witmoot-0.14.0.ebuild"
-        candidate = active if active.exists() else ROOT / "release-preparation/witmoot-0.14.0.ebuild"
-        args = recipes.compile_arguments(candidate, "witmoot", "0.14.0")
+        active = ROOT / "www-apps/witmoot/witmoot-0.14.2.ebuild"
+        candidate = active if active.exists() else ROOT / "release-preparation/witmoot-0.14.2.ebuild"
+        args = recipes.compile_arguments(candidate, "witmoot", "0.14.2")
         with self.assertRaises(ValueError):
             recipes.validate_compiled_version(args, "0.13.0")
 

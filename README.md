@@ -5,9 +5,9 @@ and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.16.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/songstead` | `0.1.2` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
-| `www-apps/witmoot` | `0.14.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/imvault` | `0.16.2` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/songstead` | `0.2.1` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
+| `www-apps/witmoot` | `0.14.2` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. The released apps also have **live `9999`
@@ -78,8 +78,8 @@ www-apps/imvault ffmpeg
 For optional Bubblewrap confinement in Imvault and Witmoot, add `bubblewrap`
 to their USE flags. This installs a non-setuid launcher; enable confinement separately
 in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
-See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.16.0/docs/sandbox.md)
-or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.14.0/docs/sandbox.md)
+See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.16.2/docs/sandbox.md)
+or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.14.2/docs/sandbox.md)
 for OpenRC settings, systemd overrides and verification.
 
 Install the applications you want:
@@ -108,12 +108,12 @@ Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
 are supported by Imvault and Witmoot too. Each app installs proxy examples under
 `/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
-- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.16.0/docs/reverse-proxies.md)
-- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.14.0/docs/reverse-proxies.md)
+- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.16.2/docs/reverse-proxies.md)
+- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.14.2/docs/reverse-proxies.md)
 
-- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.16.0/docs/deployment.md)
-- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.14.0/docs/deployment.md)
-- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.1.2/docs/deployment.md)
+- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.16.2/docs/deployment.md)
+- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.14.2/docs/deployment.md)
+- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.2.1/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
 and service paths. Generate a site configuration for your hostname with:
@@ -147,7 +147,7 @@ reads service settings and switches to the service account. Both examples keep
 the newest seven completed snapshots; rotation follows successful verification.
 Change `--keep` to choose another count; manual snapshots never rotate. Keep an
 off-host copy and test restores. See the upstream
-[operations guide](https://github.com/airencracken/imvault/blob/v0.16.0/docs/operations.md).
+[operations guide](https://github.com/airencracken/imvault/blob/v0.16.2/docs/operations.md).
 
 ## Update
 
@@ -165,7 +165,7 @@ then restart the affected service.
 Read each application's release notes before upgrading:
 [Imvault](https://github.com/airencracken/imvault/tree/master/docs/release-notes)
 [Witmoot](https://github.com/airencracken/witmoot/tree/master/docs/release-notes),
-and [Songstead](https://github.com/airencracken/songstead/blob/v0.1.2/CHANGELOG.md).
+and [Songstead](https://github.com/airencracken/songstead/blob/v0.2.1/CHANGELOG.md).
 Witmoot schema upgrades cannot be undone, so back up the entire stopped data
 directory first. Keep all OpenRC configuration files at mode 0600; they can
 contain SMTP credentials. The [September 2026 audit](AUDIT-2026-09-29.md)
@@ -225,13 +225,13 @@ For a new version, download and verify the upstream source release, then create
 its dependency bundle, for example:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.16.0 imvault_0.16.0_source.tar.gz /tmp/comfyware-distfiles
+bash scripts/make-deps.sh imvault 0.16.2 imvault_0.16.2_source.tar.gz /tmp/comfyware-distfiles
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle.
 It disables Go workspaces so a sibling development checkout cannot supply
 unpublished dependencies in place of the release's modules.
-Publish the bundle under the matching `imvault-0.16.0`, `witmoot-0.14.0`, or `songstead-0.1.2` tag in this
+Publish the bundle under the matching `imvault-0.16.2`, `witmoot-0.14.2`, or `songstead-0.2.1` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
@@ -245,7 +245,7 @@ Both a funding file and an enabled Sponsorships setting are required.
 
 ## Songstead and discussion links
 
-Songstead 0.1.2 is available as a versioned package and a live build. Its native
+Songstead 0.2.1 is available as a versioned package and a live build. Its native
 service binds `127.0.0.1:8083`; configure your hostname, secure cookies and a
 reverse proxy in `/etc/conf.d/songstead` or `/etc/songstead/songstead.env`.
 Provision an owner with `songstead create-owner --username NAME --password-prompt`.
@@ -254,12 +254,12 @@ For scripts, use `--password-stdin` with protected standard input instead. Accou
 commands discover the installed service configuration and root invocations run
 as the configured service user. Restart the updated server before provisioning
 on an existing instance. Back up `/var/lib/songstead` before upgrades; startup applies
-forward migrations. Follow the [installation guide](https://github.com/airencracken/songstead/blob/v0.1.2/docs/releases.md)
-and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.1.2/docs/deployment.md)
+forward migrations. Follow the [installation guide](https://github.com/airencracken/songstead/blob/v0.2.1/docs/releases.md)
+and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.2.1/docs/deployment.md)
 for accounts, service settings and Caddy.
 
-Witmoot 0.14.0 accepts explicit discussion drafts from Songstead recommendations
-and Imvault albums. Imvault 0.16.0 adds album discussion links and previews that
+Witmoot 0.14.2 accepts explicit discussion drafts from Songstead recommendations
+and Imvault albums. Imvault 0.16.2 adds album discussion links and previews that
 check current public visibility. Each app keeps its own accounts and data.
 Opening a draft creates no thread; choose a board or existing topic, review its
 audience, then post. Private albums retain plain links without metadata previews.
@@ -275,4 +275,13 @@ checking release/live parity, version stamps and exact Manifest entries.
 Songstead also supports the optional `bubblewrap` USE flag. Enable its launcher
 with `SONGSTEAD_SANDBOX="true"` in OpenRC, or install the systemd drop-in from
 `examples/systemd/songstead-sandbox.conf`. Run `songstead sandbox --check` as the
-service user before restarting. See [Songstead sandbox setup](https://github.com/airencracken/songstead/blob/v0.1.2/docs/sandbox.md).
+service user before restarting. See [Songstead sandbox setup](https://github.com/airencracken/songstead/blob/v0.2.1/docs/sandbox.md).
+
+Songstead 0.2.1 adds browser administration, invitations and account recovery.
+After upgrading and restarting, sign in as an owner and open Admin. For a
+previously provisioned member, `songstead set-role --username NAME --role owner`
+explicitly enables administration. Configure the public Songstead and Witmoot
+addresses in Instance settings; changes apply immediately. Owners keep the same
+private music access rules as members. Imvault 0.16.2 and Witmoot 0.14.2 share
+Comfylib 0.1.3 password confirmation and image normalization, without schema
+changes to either companion.
