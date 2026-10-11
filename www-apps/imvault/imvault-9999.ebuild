@@ -16,12 +16,13 @@ LICENSE="AGPL-3+ Apache-2.0 0BSD BSD BSD-2 MIT public-domain"
 SLOT="0"
 # go-module_live_vendor refuses to run without this.
 PROPERTIES="live"
-IUSE="bubblewrap ffmpeg"
+IUSE="bubblewrap ffmpeg +zstd"
 
 # ffmpeg is optional. Without it clips are still accepted, but they get a
 # placeholder poster instead of a frame from the video, and the duration limit
 # cannot be enforced.
 RDEPEND="
+	zstd? ( app-arch/zstd )
 	bubblewrap? ( >=sys-apps/bubblewrap-0.8[-suid(-)] )
 	acct-group/imvault
 	acct-user/imvault
@@ -123,6 +124,11 @@ pkg_preinst() {
 }
 
 pkg_postinst() {
+	elog "The running service makes compressed backups daily, keeping at most seven copies."
+	elog "Automatic archives are capped at 10 GiB; an uncompressed snapshot is capped at 5 GiB."
+	elog "Owners can check success and failures in instance settings. Copy snapshots off-host."
+	elog "zstd is preferred when available; without it the built-in gzip compressor is used."
+	elog "See the installed docs/automatic-backups.md for caps, scheduling and recovery."
 	elog "Configure /etc/conf.d/imvault (OpenRC) or /etc/imvault/imvault.env (systemd)."
 	elog "Provision an administrator before starting; see docs/deployment.md."
 	elog "Online verified backups can use the optional systemd timer or cron example."

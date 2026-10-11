@@ -17,11 +17,12 @@ LICENSE="AGPL-3+ 0BSD BSD BSD-2 MIT public-domain"
 SLOT="0"
 # go-module_live_vendor refuses to run without this.
 PROPERTIES="live"
-IUSE="bubblewrap test"
+IUSE="bubblewrap test +zstd"
 RESTRICT="!test? ( test )"
 DOCS=( README.md THIRD_PARTY.md )
 
 RDEPEND="
+	zstd? ( app-arch/zstd )
 	bubblewrap? ( >=sys-apps/bubblewrap-0.8[-suid(-)] )
 	acct-group/witmoot
 	acct-user/witmoot
@@ -84,6 +85,11 @@ src_install() {
 }
 
 pkg_postinst() {
+	elog "The running service makes compressed backups daily, keeping at most seven copies."
+	elog "Automatic archives are capped at 10 GiB; an uncompressed snapshot is capped at 5 GiB."
+	elog "Owners can check success and failures in instance settings. Copy snapshots off-host."
+	elog "zstd is preferred when available; without it the built-in gzip compressor is used."
+	elog "See the installed docs/automatic-backups.md for caps, scheduling and recovery."
 	elog "Configure /etc/conf.d/witmoot (OpenRC) or /etc/witmoot/witmoot.env (systemd)."
 	elog "The native service listens on 127.0.0.1:8082 and uses /var/lib/witmoot."
 	elog "Provision an owner before starting; see docs/deployment.md."
