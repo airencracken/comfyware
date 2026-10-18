@@ -6,7 +6,7 @@ and small communities.
 | Package | Release | What it does |
 | --- | --- | --- |
 | `www-apps/imvault` | `0.19.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/songstead` | `0.10.0` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
+| `www-apps/songstead` | `0.11.0` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
 | `www-apps/witmoot` | `0.18.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -113,7 +113,7 @@ are supported by Imvault and Witmoot too. Each app installs proxy examples under
 
 - [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.19.0/docs/deployment.md)
 - [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.18.0/docs/deployment.md)
-- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.10.0/docs/deployment.md)
+- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.11.0/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
 and service paths. Generate a site configuration for your hostname with:
@@ -165,7 +165,7 @@ then restart the affected service.
 Read each application's release notes before upgrading:
 [Imvault](https://github.com/airencracken/imvault/tree/master/docs/release-notes)
 [Witmoot](https://github.com/airencracken/witmoot/tree/master/docs/release-notes),
-and [Songstead](https://github.com/airencracken/songstead/blob/v0.10.0/CHANGELOG.md).
+and [Songstead](https://github.com/airencracken/songstead/blob/v0.11.0/CHANGELOG.md).
 Witmoot schema upgrades cannot be undone, so back up the entire stopped data
 directory first. Keep all OpenRC configuration files at mode 0600; they can
 contain SMTP credentials. The [September 2026 audit](AUDIT-2026-09-29.md)
@@ -231,7 +231,7 @@ bash scripts/make-deps.sh imvault 0.19.0 imvault_0.19.0_source.tar.gz /tmp/comfy
 The helper verifies modules and refuses to overwrite an existing bundle.
 It disables Go workspaces so a sibling development checkout cannot supply
 unpublished dependencies in place of the release's modules.
-Publish the bundle under the matching `imvault-0.19.0`, `witmoot-0.18.0`, or `songstead-0.10.0` tag in this
+Publish the bundle under the matching `imvault-0.19.0`, `witmoot-0.18.0`, or `songstead-0.11.0` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
@@ -258,7 +258,11 @@ before upgrading.
 
 ## Songstead and discussion links
 
-Songstead 0.10.0 is available as a versioned package and a live build. Like songs
+Songstead 0.11.0 is available as a versioned package and a live build. Authors can
+edit their post's music details and note, or delete it after confirmation. Edits
+preserve the audience and leave other recommendations unchanged. YouTube album
+playlists support automatic titles and artwork. Schema 10 stores corrections per
+post and retries missing previews, including older playlist links. Like songs
 privately and find them with Liked songs. Matching URLs share one song card by
 default in Recent, keeping each recommendation's sender, date, note and conversation.
 Cross-provider music stays separate. Schema 9 preserves existing listening
@@ -275,8 +279,8 @@ For scripts, use `--password-stdin` with protected standard input instead. Accou
 commands discover the installed service configuration and root invocations run
 as the configured service user. Restart the updated server before provisioning
 on an existing instance. Back up `/var/lib/songstead` before upgrades; startup applies
-forward migrations. Follow the [installation guide](https://github.com/airencracken/songstead/blob/v0.10.0/docs/releases.md)
-and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.10.0/docs/deployment.md)
+forward migrations. Follow the [installation guide](https://github.com/airencracken/songstead/blob/v0.11.0/docs/releases.md)
+and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.11.0/docs/deployment.md)
 for accounts, service settings and Caddy.
 
 Witmoot 0.18.0 accepts explicit discussion drafts from Songstead recommendations
@@ -285,7 +289,7 @@ check current public visibility. Each app keeps its own accounts and data.
 Opening a draft creates no thread; choose a board or existing topic, review its
 audience, then post. Private albums retain plain links without metadata previews.
 Configure the optional connections using the deployment guides before enabling
-them. Songstead 0.10.0 and Witmoot 0.18.0 pin published Comfylib 0.1.6;
+them. Songstead 0.11.0 and Witmoot 0.18.0 pin published Comfylib 0.1.6;
 Imvault 0.19.0 pins Comfylib 0.1.6.
 
 The installation checks stage files without creating accounts or starting
@@ -297,7 +301,7 @@ checking release/live parity, version stamps and exact Manifest entries.
 Songstead also supports the optional `bubblewrap` USE flag. Enable its launcher
 with `SONGSTEAD_SANDBOX="true"` in OpenRC, or install the systemd drop-in from
 `examples/systemd/songstead-sandbox.conf`. Run `songstead sandbox --check` as the
-service user before restarting. See [Songstead sandbox setup](https://github.com/airencracken/songstead/blob/v0.10.0/docs/sandbox.md).
+service user before restarting. See [Songstead sandbox setup](https://github.com/airencracken/songstead/blob/v0.11.0/docs/sandbox.md).
 
 Songstead includes browser administration, invitations and account recovery.
 After upgrading and restarting, sign in as an owner and open Admin. For a
@@ -308,7 +312,7 @@ private music access rules as members. Imvault 0.19.0 and Witmoot 0.18.0 use
 Comfylib's shared password confirmation and branding image normalization. Each
 application retains its own account and invitation policies.
 
-Songstead 0.10.0 includes freeform genre and tags, private discovery preferences,
+Songstead 0.11.0 includes freeform genre and tags, private discovery preferences,
 compact List thumbnails, optional artwork tiles and supported-link previews before
 sharing. View and discovery switches apply immediately; genre/tag pickers sit
 beneath them, with additional dropdowns under More filters.
@@ -333,7 +337,7 @@ can upload or remove an avatar under Your account and save whether they see
 animation. Device reduced-motion preferences and visitors receive still images.
 Stop the service and back up its data directory before the schema 19 upgrade.
 
-Songstead 0.10.0 includes Recent → Comments: a chronological feed of conversations
+Songstead 0.11.0 includes Recent → Comments: a chronological feed of conversations
 on music shared with everyone on the instance. Private sends and personal
 listening feedback stay out, and timestamped comments follow each viewer's
 annotation preferences and indicated positions before pagination. The current release
@@ -348,7 +352,7 @@ Personal exports include only the exporting member’s profile. New profile stor
 uses Songstead schema 9, Witmoot schema 19 and Imvault migration 032. Back up each
 stopped application’s complete data directory before upgrading.
 
-Songstead 0.10.0 adds signed-in search for music titles, artists, genres, tags,
+Songstead 0.11.0 adds signed-in search for music titles, artists, genres, tags,
 shared messages and visible comments. Private sends and groups retain their
 audience rules, and spoiler-hidden comments cannot affect result pages.
 Personal listening notes and ratings are never searched. Schema 8 is unchanged.
@@ -361,7 +365,7 @@ back up Imvault before migration 032, then upgrade and restart.
 
 ## Automatic compressed backups
 
-Songstead 0.10.0, Witmoot 0.18.0 and Imvault 0.19.0 create verified backups
+Songstead 0.11.0, Witmoot 0.18.0 and Imvault 0.19.0 create verified backups
 automatically while running. The first attempt starts one minute after service
 startup, then every 24h, remembering successful backups across restarts.
 Comfylib 0.1.6 shares scheduling, compression, private publication and rotation.
@@ -382,6 +386,6 @@ Snapshots live under the app's private data directory in backups/; copy
 completed snapshots off-host. Allow additional staging space during a backup.
 Recovery and service configuration details:
 
-- [Songstead automatic backups](https://github.com/airencracken/songstead/blob/v0.10.0/docs/automatic-backups.md)
+- [Songstead automatic backups](https://github.com/airencracken/songstead/blob/v0.11.0/docs/automatic-backups.md)
 - [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.18.0/docs/automatic-backups.md)
 - [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.19.0/docs/automatic-backups.md)
