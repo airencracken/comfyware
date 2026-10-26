@@ -188,15 +188,16 @@ class ReadmeConsistency(unittest.TestCase):
     def test_stale_claims_are_rejected(self):
         readme = (ROOT / "README.md").read_text()
         newest = newest_versions()
-        version = newest["witmoot"]
-        mutations = {
-            "package table": readme.replace(f"`www-apps/witmoot` | `{version}`", "`www-apps/witmoot` | `0.0.1`"),
-            "pinned to": readme.replace(f"witmoot/blob/v{version}/", "witmoot/blob/v0.0.1/", 1),
-            "capitalised": readme + "\nInstall imvault first.\n",
-        }
-        for expected, mutated in mutations.items():
-            with self.subTest(mutation=expected):
+        mutations = {"capitalised": readme + "\nInstall imvault first.\n"}
+        for app, version in newest.items():
+            mutations.update({
+                f"package table: {app}": readme.replace(f"`www-apps/{app}` | `{version}`", f"`www-apps/{app}` | `0.0.1`"),
+                f"pinned to: {app}": readme.replace(f"{app}/blob/v{version}/", f"{app}/blob/v0.0.1/", 1),
+            })
+        for mutation, mutated in mutations.items():
+            with self.subTest(mutation=mutation):
                 self.assertNotEqual(mutated, readme, "mutation did not apply")
+                expected = mutation.split(":", 1)[0]
                 self.assertTrue(any(expected in error for error in readme_errors(mutated, newest)))
 
 

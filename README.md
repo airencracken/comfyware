@@ -7,7 +7,7 @@ and small communities.
 | --- | --- | --- |
 | `www-apps/imvault` | `0.20.4` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/songstead` | `0.11.3` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
-| `www-apps/witmoot` | `0.18.3` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/witmoot` | `0.18.4` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. The released apps also have **live `9999`
@@ -79,7 +79,7 @@ For optional Bubblewrap confinement in Imvault and Witmoot, add `bubblewrap`
 to their USE flags. This installs a non-setuid launcher; enable confinement separately
 in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
 See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.20.4/docs/sandbox.md)
-or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.18.3/docs/sandbox.md)
+or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/sandbox.md)
 for OpenRC settings, systemd overrides and verification.
 
 Install the applications you want:
@@ -109,10 +109,10 @@ are supported by Imvault and Witmoot too. Each app installs proxy examples under
 `/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
 - [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.20.4/docs/reverse-proxies.md)
-- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.18.3/docs/reverse-proxies.md)
+- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/reverse-proxies.md)
 
 - [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.20.4/docs/deployment.md)
-- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.18.3/docs/deployment.md)
+- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/deployment.md)
 - [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.11.3/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
@@ -151,7 +151,7 @@ off-host copy and test restores. See the upstream
 
 ## Shared Comfylib foundation
 
-Imvault 0.20.4, Witmoot 0.18.3 and Songstead 0.11.3 pin the published
+Imvault 0.20.4, Witmoot 0.18.4 and Songstead 0.11.3 pin the published
 [Comfylib v0.1.7](https://github.com/airencracken/comfylib/releases/tag/v0.1.7)
 module for shared invitation/account styles, invitation status calculation and
 browser assertions. Its exact source is included in each verified dependency
@@ -160,7 +160,7 @@ Witmoot and Songstead also wrap long backup paths on mobile settings pages.
 
 ## Invitation and account screens
 
-Imvault 0.20.4, Witmoot 0.18.3 and Songstead 0.11.3 align invitation management,
+Imvault 0.20.4, Witmoot 0.18.4 and Songstead 0.11.3 align invitation management,
 sign-in and joining forms across the apps. Compact creation forms sit beside
 readable invitation records on desktop and stack on mobile. Decorative eyebrow
 labels are removed. Songstead also shows invitation availability and keeps form
@@ -169,6 +169,13 @@ drafts after validation errors.
 These patches add no database migrations. They retain Imvault schema 034,
 Witmoot schema 020 and Songstead schema 10. Existing service configuration and
 package paths continue to apply.
+
+## Witmoot reply refresh
+
+Witmoot 0.18.4 refreshes the conversation after replying from a message
+permalink and drops repeated submissions while a reply is pending. It adds no
+database migrations; the current schema remains 020. Sync this overlay, upgrade
+the package, then restart Witmoot to apply the fix.
 
 ## Update
 
@@ -259,7 +266,7 @@ bash scripts/make-deps.sh imvault 0.20.4 imvault_0.20.4_source.tar.gz /tmp/comfy
 The helper verifies modules and refuses to overwrite an existing bundle.
 It disables Go workspaces so a sibling development checkout cannot supply
 unpublished dependencies in place of the release's modules.
-Publish the bundle under the matching `imvault-0.20.4`, `witmoot-0.18.3`, or `songstead-0.11.3` tag in this
+Publish the bundle under the matching `imvault-0.20.4`, `witmoot-0.18.4`, or `songstead-0.11.3` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
@@ -281,7 +288,7 @@ boards stay out. Edits retain their original position.
 
 Migration 020 adds an index without rewriting messages. Keep a verified pre-upgrade
 backup; older binaries require the matching pre-upgrade database. Read the
-[Witmoot 0.18.0 release notes](https://github.com/airencracken/witmoot/blob/v0.18.3/docs/release-notes/0.18.0.md)
+[Witmoot 0.18.0 release notes](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/release-notes/0.18.0.md)
 before upgrading.
 
 ## Songstead and discussion links
@@ -415,5 +422,5 @@ completed snapshots off-host. Allow additional staging space during a backup.
 Recovery and service configuration details:
 
 - [Songstead automatic backups](https://github.com/airencracken/songstead/blob/v0.11.3/docs/automatic-backups.md)
-- [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.18.3/docs/automatic-backups.md)
+- [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/automatic-backups.md)
 - [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.20.4/docs/automatic-backups.md)
