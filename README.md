@@ -5,7 +5,7 @@ and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.20.4` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/imvault` | `0.20.6` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/songstead` | `0.11.3` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
 | `www-apps/witmoot` | `0.18.4` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
@@ -78,7 +78,7 @@ www-apps/imvault ffmpeg
 For optional Bubblewrap confinement in Imvault and Witmoot, add `bubblewrap`
 to their USE flags. This installs a non-setuid launcher; enable confinement separately
 in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
-See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.20.4/docs/sandbox.md)
+See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.20.6/docs/sandbox.md)
 or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/sandbox.md)
 for OpenRC settings, systemd overrides and verification.
 
@@ -108,10 +108,10 @@ Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
 are supported by Imvault and Witmoot too. Each app installs proxy examples under
 `/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
-- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.20.4/docs/reverse-proxies.md)
+- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.20.6/docs/reverse-proxies.md)
 - [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/reverse-proxies.md)
 
-- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.20.4/docs/deployment.md)
+- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.20.6/docs/deployment.md)
 - [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/deployment.md)
 - [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.11.3/docs/deployment.md)
 
@@ -147,11 +147,11 @@ reads service settings and switches to the service account. Both examples keep
 the newest seven completed snapshots; rotation follows successful verification.
 Change `--keep` to choose another count; manual snapshots never rotate. Keep an
 off-host copy and test restores. See the upstream
-[operations guide](https://github.com/airencracken/imvault/blob/v0.20.4/docs/operations.md).
+[operations guide](https://github.com/airencracken/imvault/blob/v0.20.6/docs/operations.md).
 
 ## Shared Comfylib foundation
 
-Imvault 0.20.4, Witmoot 0.18.4 and Songstead 0.11.3 pin the published
+Imvault 0.20.6, Witmoot 0.18.4 and Songstead 0.11.3 pin the published
 [Comfylib v0.1.7](https://github.com/airencracken/comfylib/releases/tag/v0.1.7)
 module for shared invitation/account styles, invitation status calculation and
 browser assertions. Its exact source is included in each verified dependency
@@ -160,7 +160,7 @@ Witmoot and Songstead also wrap long backup paths on mobile settings pages.
 
 ## Invitation and account screens
 
-Imvault 0.20.4, Witmoot 0.18.4 and Songstead 0.11.3 align invitation management,
+Imvault 0.20.6, Witmoot 0.18.4 and Songstead 0.11.3 align invitation management,
 sign-in and joining forms across the apps. Compact creation forms sit beside
 readable invitation records on desktop and stack on mobile. Decorative eyebrow
 labels are removed. Songstead also shows invitation availability and keeps form
@@ -176,6 +176,14 @@ Witmoot 0.18.4 refreshes the conversation after replying from a message
 permalink and drops repeated submissions while a reply is pending. It adds no
 database migrations; the current schema remains 020. Sync this overlay, upgrade
 the package, then restart Witmoot to apply the fix.
+
+## Create albums while organizing photos
+
+Imvault 0.20.6 adds “Create a new album” to the gallery’s bulk album picker,
+including before the first album exists. The new album and all selected
+memberships are saved atomically. Albums start private, and existing photo
+sharing stays unchanged. No database migration is added; schema 034 remains
+current. Upgrade the package and restart Imvault to use the new picker.
 
 ## Update
 
@@ -198,8 +206,8 @@ Imvault 0.20.0 adds migrations 033 and 034 for private 30-day Trash and camera-d
 browsing. Back up with the currently installed binary before upgrading; returning
 to an older binary requires its matching pre-upgrade database. Owner API deletion
 now moves files to Trash, which retains quota until permanent deletion. See the
-[Imvault release notes](https://github.com/airencracken/imvault/blob/v0.20.4/docs/release-notes/0.20.0.md)
-and [library guide](https://github.com/airencracken/imvault/blob/v0.20.4/docs/library.md).
+[Imvault release notes](https://github.com/airencracken/imvault/blob/v0.20.6/docs/release-notes/0.20.0.md)
+and [library guide](https://github.com/airencracken/imvault/blob/v0.20.6/docs/library.md).
 
 Witmoot schema upgrades cannot be undone, so back up the entire stopped data
 directory first. Keep all OpenRC configuration files at mode 0600; they can
@@ -260,13 +268,13 @@ For a new version, download and verify the upstream source release, then create
 its dependency bundle, for example:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.20.4 imvault_0.20.4_source.tar.gz /tmp/comfyware-distfiles
+bash scripts/make-deps.sh imvault 0.20.6 imvault_0.20.6_source.tar.gz /tmp/comfyware-distfiles
 ```
 
 The helper verifies modules and refuses to overwrite an existing bundle.
 It disables Go workspaces so a sibling development checkout cannot supply
 unpublished dependencies in place of the release's modules.
-Publish the bundle under the matching `imvault-0.20.4`, `witmoot-0.18.4`, or `songstead-0.11.3` tag in this
+Publish the bundle under the matching `imvault-0.20.6`, `witmoot-0.18.4`, or `songstead-0.11.3` tag in this
 repository's GitHub Releases. Update the release ebuild and generate its Manifest
 with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
 and tests with Portage before publishing. Keep existing distfiles immutable.
@@ -423,4 +431,4 @@ Recovery and service configuration details:
 
 - [Songstead automatic backups](https://github.com/airencracken/songstead/blob/v0.11.3/docs/automatic-backups.md)
 - [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/automatic-backups.md)
-- [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.20.4/docs/automatic-backups.md)
+- [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.20.6/docs/automatic-backups.md)

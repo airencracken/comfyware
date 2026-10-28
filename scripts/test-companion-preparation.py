@@ -13,7 +13,7 @@ spec.loader.exec_module(recipes)
 
 class CompanionPreparation(unittest.TestCase):
     def test_recipes_match_live_services_and_compile_versions(self):
-        for app, version in (("witmoot", "0.18.4"), ("imvault", "0.20.4")):
+        for app, version in (("witmoot", "0.18.4"), ("imvault", "0.20.6")):
             with self.subTest(app=app):
                 staged = ROOT / "release-preparation" / f"{app}-{version}.ebuild"
                 active = ROOT / "www-apps" / app / staged.name
@@ -27,7 +27,7 @@ class CompanionPreparation(unittest.TestCase):
                 subprocess.run(["bash", "-n", str(candidate)], check=True)
 
     def test_activation_matches_manifest_claims(self):
-        for app, version in (("witmoot", "0.18.4"), ("imvault", "0.20.4")):
+        for app, version in (("witmoot", "0.18.4"), ("imvault", "0.20.6")):
             package = ROOT / "www-apps" / app
             active = package / f"{app}-{version}.ebuild"
             manifest = (package / "Manifest").read_text()

@@ -5,7 +5,7 @@ import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"songstead": "0.11.3", "witmoot": "0.18.4", "imvault": "0.20.4"}
+VERSIONS = {"songstead": "0.11.3", "witmoot": "0.18.4", "imvault": "0.20.6"}
 
 def errors(text):
     problems = []
