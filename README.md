@@ -7,8 +7,8 @@ and small communities.
 | --- | --- | --- |
 | `www-apps/imvault` | `0.20.6` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/songstead` | `0.11.3` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
-| `www-apps/folkweave` | `0.1.0` | [Folkweave](https://github.com/airencracken/folkweave), a private group timeline |
-| `www-apps/tidings` | `0.1.0` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
+| `www-apps/folkweave` | `0.1.1` | [Folkweave](https://github.com/airencracken/folkweave), a private group timeline |
+| `www-apps/tidings` | `0.2.0` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
 | `www-apps/witmoot` | `0.18.4` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -445,9 +445,9 @@ Recovery and service configuration details:
 - [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/automatic-backups.md)
 - [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.20.6/docs/automatic-backups.md)
 
-## Folkweave and Tidings initial releases
+## Folkweave and Tidings
 
-Folkweave 0.1.0 and Tidings 0.1.0 join the released applications, each with a
+Folkweave 0.1.1 and Tidings 0.2.0 are released applications, each with a
 live 9999 recipe and a dedicated service account. Install `www-apps/folkweave`
 or `www-apps/tidings` after adding their `~*` keyword and those of their matching
 `acct-user` and `acct-group` packages, as for the other apps above.
@@ -470,3 +470,9 @@ backups, and support manual backup and restoration into a fresh directory.
 Their source downloads, containers, documentation and Ko-fi support links live
 at [Folkweave](https://github.com/airencracken/folkweave) and
 [Tidings](https://github.com/airencracken/tidings).
+
+The OpenRC scripts pass supported ordinary `APP_*=value` assignments from
+`/etc/conf.d/folkweave` and `/etc/conf.d/tidings` to the service; `export` is optional.
+Tidings owners manage suggested-source categories, invitations, and immediate
+instance-wide feed fetching from their account. Suggested categories begin
+disabled, including on upgrade, and never change existing subscriptions.
