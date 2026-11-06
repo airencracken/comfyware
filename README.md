@@ -1,12 +1,14 @@
 # comfyware
 
-Gentoo packages for Imvault, Witmoot and Songstead: apps you can host for friends, family,
+Gentoo packages for Imvault, Witmoot, Songstead, Folkweave and Tidings: apps you can host for friends, family,
 and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
 | `www-apps/imvault` | `0.20.6` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/songstead` | `0.11.3` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
+| `www-apps/folkweave` | `0.1.0` | [Folkweave](https://github.com/airencracken/folkweave), a private group timeline |
+| `www-apps/tidings` | `0.1.0` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
 | `www-apps/witmoot` | `0.18.4` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -56,6 +58,12 @@ if your configuration uses directories):
 www-apps/imvault::comfyware ~*
 www-apps/witmoot::comfyware ~*
 www-apps/songstead::comfyware ~*
+www-apps/folkweave::comfyware ~*
+acct-user/folkweave::comfyware ~*
+acct-group/folkweave::comfyware ~*
+www-apps/tidings::comfyware ~*
+acct-user/tidings::comfyware ~*
+acct-group/tidings::comfyware ~*
 acct-user/imvault::comfyware ~*
 acct-group/imvault::comfyware ~*
 acct-user/witmoot::comfyware ~*
@@ -85,7 +93,7 @@ for OpenRC settings, systemd overrides and verification.
 Install the applications you want:
 
 ```sh
-emerge --ask www-apps/imvault::comfyware www-apps/witmoot::comfyware www-apps/songstead::comfyware
+emerge --ask www-apps/imvault::comfyware www-apps/witmoot::comfyware www-apps/songstead::comfyware www-apps/folkweave::comfyware www-apps/tidings::comfyware
 ```
 
 The packages provide dedicated service accounts, `/usr/bin` binaries, OpenRC
@@ -97,11 +105,13 @@ They do not enable or start services for you.
 | Imvault | `/etc/conf.d/imvault` | `/etc/imvault/imvault.env` | `/var/lib/imvault` |
 | Witmoot | `/etc/conf.d/witmoot` | `/etc/witmoot/witmoot.env` | `/var/lib/witmoot` |
 | Songstead | `/etc/conf.d/songstead` | `/etc/songstead/songstead.env` | `/var/lib/songstead` |
+| Folkweave | `/etc/conf.d/folkweave` | `/etc/folkweave/folkweave.env` | `/var/lib/folkweave` |
+| Tidings | `/etc/conf.d/tidings` | `/etc/tidings/tidings.env` | `/var/lib/tidings` |
 
 Configure your hostname and reverse proxy, and provision the administrator or
 owner before starting. Set `IMVAULT_ADDR="127.0.0.1:8080"` in Imvault's service
 configuration; Witmoot's native service defaults to `127.0.0.1:8082`.
-Songstead defaults to `127.0.0.1:8083`. Use the packaged `/usr/bin` binaries
+Songstead defaults to `127.0.0.1:8083`, Folkweave to `127.0.0.1:8084`, and Tidings to `127.0.0.1:8085`. Use the packaged `/usr/bin` binaries
 in provisioning commands.
 
 Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
@@ -192,7 +202,7 @@ installed packages:
 
 ```sh
 emaint sync -r comfyware
-emerge --ask --update www-apps/imvault::comfyware www-apps/witmoot::comfyware www-apps/songstead::comfyware
+emerge --ask --update www-apps/imvault::comfyware www-apps/witmoot::comfyware www-apps/songstead::comfyware www-apps/folkweave::comfyware www-apps/tidings::comfyware
 ```
 
 Review protected configuration changes with `dispatch-conf` or `etc-update`,
@@ -231,6 +241,8 @@ To follow upstream `master`, additionally accept the exact live versions:
 =www-apps/imvault-9999::comfyware **
 =www-apps/witmoot-9999::comfyware **
 =www-apps/songstead-9999::comfyware **
+=www-apps/folkweave-9999::comfyware **
+=www-apps/tidings-9999::comfyware **
 ```
 
 Then explicitly rebuild with `emerge --ask --oneshot =www-apps/imvault-9999::comfyware`
@@ -432,3 +444,29 @@ Recovery and service configuration details:
 - [Songstead automatic backups](https://github.com/airencracken/songstead/blob/v0.11.3/docs/automatic-backups.md)
 - [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.18.4/docs/automatic-backups.md)
 - [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.20.6/docs/automatic-backups.md)
+
+## Folkweave and Tidings initial releases
+
+Folkweave 0.1.0 and Tidings 0.1.0 join the released applications, each with a
+live 9999 recipe and a dedicated service account. Install `www-apps/folkweave`
+or `www-apps/tidings` after adding their `~*` keyword and those of their matching
+`acct-user` and `acct-group` packages, as for the other apps above.
+
+Folkweave uses `/var/lib/folkweave` and localhost port **8084**. Configure
+`/etc/conf.d/folkweave` (OpenRC) or `/etc/folkweave/folkweave.env` (systemd), then
+run `folkweave init --username owner --name "Your name" --title "Our group"`.
+It has one invited group-wide audience. Parental approval controls remain future
+work; shared photographs are normalized copies, so keep originals separately.
+
+Tidings uses `/var/lib/tidings` and localhost port **8085**, avoiding Songstead's
+8083. Configure `/etc/conf.d/tidings` or `/etc/tidings/tidings.env`, then run
+`tidings create-owner --username owner`. Individual subscriptions and reading
+state stay personal. The shared household reading table is opt-in.
+
+Run installed administrative commands as root to re-execute as the configured
+service account. Configure HTTPS before inviting members, then enable/start
+the matching OpenRC or systemd service. Both apps make verified automatic
+backups, and support manual backup and restoration into a fresh directory.
+Their source downloads, containers, documentation and Ko-fi support links live
+at [Folkweave](https://github.com/airencracken/folkweave) and
+[Tidings](https://github.com/airencracken/tidings).

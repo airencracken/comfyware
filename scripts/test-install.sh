@@ -9,7 +9,7 @@ source_dir=$(realpath "$2") || exit 1
 PF=$(basename "$ebuild" .ebuild)
 # Staged release recipes live outside www-apps, so use the recipe's filename.
 PN=${PF%%-[0-9]*}
-case "$PN" in imvault|witmoot|songstead) ;; *) fail 'Expected an imvault, witmoot or songstead ebuild.' ;; esac
+case "$PN" in imvault|witmoot|songstead|folkweave|tidings) ;; *) fail 'Expected a Comfyware application ebuild.' ;; esac
 # The sourced ebuild reads these Portage variables.
 # shellcheck disable=SC2034
 {
@@ -28,7 +28,9 @@ T="$work/temp"
 # shellcheck disable=SC2034
 WORKDIR="$work"
 mkdir -p "$ED" "$T" "$work/source" || exit 1
-cp -R "$source_dir/contrib" "$work/source/" || exit 1
+examples=contrib
+case "$PN" in folkweave|tidings) examples=deploy ;; esac
+cp -R "$source_dir/$examples" "$work/source/" || exit 1
 cd "$work/source" || exit 1
 printf '#!/bin/sh\nexit 0\n' > "$PN" || exit 1
 chmod 0755 "$PN" || exit 1
@@ -71,7 +73,7 @@ src_install || fail "$PF src_install failed."
 if [[ $PN == songstead && " ${IUSE:-} " == *" bubblewrap "* ]]; then
 	[[ -e $work/sandbox-dropin ]] || fail 'Songstead sandbox drop-in is missing.'
 fi
-cmp contrib/logrotate/"$PN" "$ED/etc/logrotate.d/$PN" || fail 'Packaged logrotate rule is missing or altered.'
+cmp "$examples/logrotate/$PN" "$ED/etc/logrotate.d/$PN" || fail 'Packaged logrotate rule is missing or altered.'
 [[ $(stat -c %a "$ED/etc/logrotate.d/$PN") == 644 ]] || fail 'Logrotate rule is not mode 0644.'
 [[ -x $ED/etc/init.d/$PN && -s $ED/etc/conf.d/$PN ]] || fail 'OpenRC service or settings are missing.'
 [[ $(stat -c %a "$ED/etc/conf.d/$PN") == 600 ]] || fail "OpenRC configuration must be mode 0600 to protect credentials."
@@ -79,7 +81,14 @@ cmp contrib/logrotate/"$PN" "$ED/etc/logrotate.d/$PN" || fail 'Packaged logrotat
 # source-install default is.
 initd="$ED/etc/init.d/$PN"
 grep -q '/usr/local/bin' "$initd" && fail 'OpenRC service still refers to /usr/local/bin.'
+case "$PN" in
+folkweave|tidings)
+ grep -qx "command=\"/usr/bin/$PN\"" "$initd" || fail 'OpenRC service does not use /usr/bin.'
+ ;;
+*)
 grep -Eq "^: \"\\\$\{[A-Z]+_BIN:=/usr/bin/$PN\}\"$" "$initd" || fail 'OpenRC service does not default to /usr/bin.'
+ ;;
+esac
 [[ -x $ED/usr/bin/$PN ]] || fail 'Executable is missing from /usr/bin.'
 [[ -d $ED/var/lib/$PN && $(stat -c %a "$ED/var/lib/$PN") == 700 ]] || fail 'Application data directory must be mode 0700.'
 env_file="$ED/etc/$PN/$PN.env"
@@ -90,14 +99,16 @@ case $(stat -c %a "$env_file") in
 esac
 grep -qx "/usr/share/doc/$PF/examples" "$work/docompress-skip" 2>/dev/null || fail 'Proxy examples would be installed compressed.'
 unit="$ED/usr/lib/systemd/system/$PN.service"
-if [[ $PN == songstead ]]; then
- grep -qx 'ExecStart=/usr/bin/songstead serve' "$unit" || fail 'Songstead systemd command is incorrect.'
+if [[ $PN == songstead || $PN == folkweave || $PN == tidings ]]; then
+ grep -qx "ExecStart=/usr/bin/$PN serve" "$unit" || fail 'Application systemd command is incorrect.'
 else
 grep -Eq "^ExecStart=(\"/usr/bin/$PN\"|/usr/bin/$PN)$" "$unit" || fail 'systemd executable is not under /usr/bin.'
 fi
+if [[ $PN != folkweave && $PN != tidings ]]; then
 for setting in StandardOutput=journal StandardError=journal "SyslogIdentifier=$PN"; do
 	grep -qx "$setting" "$unit" || fail "Packaged systemd unit is missing $setting."
 done
+fi
 if [[ $PN == imvault && -f contrib/systemd/imvault-backup.service ]]; then
 	grep -qx 'ExecStart=/usr/bin/imvault backup --output-dir /var/backups/imvault --keep 7' "$ED/usr/lib/systemd/system/imvault-backup.service" || fail 'Packaged backup command is incorrect.'
 	cmp contrib/systemd/imvault-backup.timer "$ED/usr/lib/systemd/system/imvault-backup.timer" || fail 'Packaged backup timer differs.'

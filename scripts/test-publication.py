@@ -51,7 +51,7 @@ class PublicationTests(unittest.TestCase):
 mkdir -p "$GOMODCACHE" || exit 1
 printf '%s\\n' "$2" > "$GOMODCACHE/$2" || exit 1
 '''
-        for app in ("imvault", "witmoot", "songstead"):
+        for app in ("imvault", "witmoot", "songstead", "folkweave", "tidings"):
             for workspace in ("auto", str(self.work / "unpublished sibling/go.work")):
                 with self.subTest(app=app, workspace=workspace):
                     self.target = self.output / f"{app}-1.2.3-deps.tar.xz"
