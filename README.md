@@ -8,7 +8,7 @@ and small communities.
 | `www-apps/imvault` | `0.21.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/songstead` | `0.12.0` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
 | `www-apps/folkweave` | `0.2.0` | [Folkweave](https://github.com/airencracken/folkweave), a private group timeline |
-| `www-apps/tidings` | `0.3.1` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
+| `www-apps/tidings` | `0.4.0` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
 | `www-apps/witmoot` | `0.19.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -489,3 +489,10 @@ Root invocations use the configured service account. `--password-stdin`,
 Tidings 0.3.1 also shows live fetch progress, fetches newly followed feeds
 immediately, and offers optional locally cached feed images in the owner's account
 settings. Its database migrates to schema 4 with images disabled initially.
+
+Tidings 0.4.0 preserves article formatting, can fetch full stories, removes known
+tracking fields from article links, and adapts each feed's polling schedule.
+Keyboard shortcuts are a personal setting and default to off, including upgrades.
+The saved theme now applies before page content appears. Schema 5 adds private
+article copies and schedules; the first refresh requests full feed bodies to
+populate formatting while keeping everyone's reading state.
