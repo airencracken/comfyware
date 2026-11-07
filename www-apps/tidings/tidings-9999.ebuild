@@ -74,9 +74,12 @@ src_install() {
 }
 
 pkg_postinst() {
+	elog "Browser setup: start the service, then run tidings setup for its private key."
+	elog "Command-line owner: tidings create-owner --username NAME"
+	elog "Password recovery: tidings set-password --username NAME"
+	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
 	elog "Configure /etc/conf.d/tidings or /etc/tidings/tidings.env and your HTTPS proxy."
 	elog "Native defaults: 127.0.0.1:8085 and /var/lib/tidings."
-	elog "Provision the owner before starting: tidings create-owner --username NAME"
 	elog "Installed administrative commands invoked as root use the service account."
 	elog "Read /usr/share/doc/${PF}/docs/ for installation, backups and recovery."
 	elog "The service creates verified compressed backups daily; copy them off-host."

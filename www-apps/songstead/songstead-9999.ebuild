@@ -89,6 +89,10 @@ src_install() {
 }
 
 pkg_postinst() {
+	elog "Browser setup: start the service, then run songstead setup for its private key."
+	elog "Command-line owner: songstead create-owner --username NAME"
+	elog "Password recovery: songstead set-password --username NAME"
+	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
 	elog "The running service makes compressed backups daily, keeping at most seven copies."
 	elog "Automatic archives are capped at 10 GiB; an uncompressed snapshot is capped at 5 GiB."
 	elog "Owners can check success and failures in instance settings. Copy snapshots off-host."
@@ -96,7 +100,6 @@ pkg_postinst() {
 	elog "See the installed docs/automatic-backups.md for caps, scheduling and recovery."
 	elog "Configure /etc/conf.d/songstead (OpenRC) or /etc/songstead/songstead.env (systemd)."
 	elog "The native service listens on 127.0.0.1:8083 and uses /var/lib/songstead."
-	elog "Provision a new owner: songstead create-owner --username NAME --password-prompt"
 	elog "Account commands discover service settings and use the service account when invoked as root."
 	elog "On upgrades, restart the updated service before running account commands."
 	elog "For an existing member: songstead set-role --username NAME --role owner"

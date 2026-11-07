@@ -85,6 +85,10 @@ src_install() {
 }
 
 pkg_postinst() {
+	elog "Browser setup: start the service, then run witmoot setup for its private key."
+	elog "Command-line owner: witmoot create-owner --username NAME"
+	elog "Password recovery: witmoot set-password --username NAME"
+	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
 	elog "The running service makes compressed backups daily, keeping at most seven copies."
 	elog "Automatic archives are capped at 10 GiB; an uncompressed snapshot is capped at 5 GiB."
 	elog "Owners can check success and failures in instance settings. Copy snapshots off-host."
@@ -92,7 +96,6 @@ pkg_postinst() {
 	elog "See the installed docs/automatic-backups.md for caps, scheduling and recovery."
 	elog "Configure /etc/conf.d/witmoot (OpenRC) or /etc/witmoot/witmoot.env (systemd)."
 	elog "The native service listens on 127.0.0.1:8082 and uses /var/lib/witmoot."
-	elog "Provision an owner before starting; see docs/deployment.md."
 	elog "Bubblewrap confinement is optional; see docs/sandbox.md."
 	elog "Both guides are in /usr/share/doc/${PF}/docs/ and at"
 	elog "https://github.com/airencracken/witmoot/tree/master/docs"

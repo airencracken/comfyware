@@ -75,9 +75,12 @@ src_install() {
 }
 
 pkg_postinst() {
+	elog "Browser setup: start the service, then run folkweave setup for its private key."
+	elog "Command-line owner: folkweave create-owner --username NAME"
+	elog "Password recovery: folkweave set-password --username NAME"
+	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
 	elog "Configure /etc/conf.d/folkweave or /etc/folkweave/folkweave.env and your HTTPS proxy."
 	elog "Native defaults: 127.0.0.1:8084 and /var/lib/folkweave."
-	elog "Provision the owner before starting: folkweave init --username NAME"
 	elog "Installed administrative commands invoked as root use the service account."
 	elog "Read /usr/share/doc/${PF}/docs/ for installation, backups and recovery."
 	elog "The service creates verified compressed backups daily; copy them off-host."

@@ -124,13 +124,16 @@ pkg_preinst() {
 }
 
 pkg_postinst() {
+	elog "Browser setup: start the service, then run imvault setup for its private key."
+	elog "Command-line owner: imvault create-owner --username NAME"
+	elog "Password recovery: imvault set-password --username NAME"
+	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
 	elog "The running service makes compressed backups daily, keeping at most seven copies."
 	elog "Automatic archives are capped at 10 GiB; an uncompressed snapshot is capped at 5 GiB."
 	elog "Owners can check success and failures in instance settings. Copy snapshots off-host."
 	elog "zstd is preferred when available; without it the built-in gzip compressor is used."
 	elog "See the installed docs/automatic-backups.md for caps, scheduling and recovery."
 	elog "Configure /etc/conf.d/imvault (OpenRC) or /etc/imvault/imvault.env (systemd)."
-	elog "Provision an administrator before starting; see docs/deployment.md."
 	elog "Online verified backups can use the optional systemd timer or cron example."
 	elog "Neither scheduler is enabled automatically; see docs/operations.md."
 	elog "Bubblewrap confinement is optional; see docs/sandbox.md."
