@@ -8,7 +8,7 @@ and small communities.
 | `www-apps/imvault` | `0.21.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
 | `www-apps/songstead` | `0.12.0` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
 | `www-apps/folkweave` | `0.2.0` | [Folkweave](https://github.com/airencracken/folkweave), a private group timeline |
-| `www-apps/tidings` | `0.4.0` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
+| `www-apps/tidings` | `0.4.1` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
 | `www-apps/witmoot` | `0.19.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
@@ -496,3 +496,8 @@ Keyboard shortcuts are a personal setting and default to off, including upgrades
 The saved theme now applies before page content appears. Schema 5 adds private
 article copies and schedules; the first refresh requests full feed bodies to
 populate formatting while keeping everyone's reading state.
+
+Tidings 0.4.1 fixes publisher TLS and content-negotiation compatibility for full
+stories, including OpenAI pages, and reports specific fetch failures. TLS
+certificate checks and the public-network restriction remain enabled. No database
+migration is needed for this patch.
