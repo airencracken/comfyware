@@ -27,7 +27,7 @@ RDEPEND="
 	zstd? ( app-arch/zstd )
 "
 BDEPEND+="
-	>=dev-lang/go-1.26.0
+	>=dev-lang/go-1.26.11
 	acct-group/tidings
 	acct-user/tidings
 "

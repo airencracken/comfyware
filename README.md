@@ -14,7 +14,7 @@ and small communities.
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. The released apps also have **live `9999`
 ebuilds** that build upstream `master` and fetch dependencies during unpack.
-Go 1.26 or newer is required and pulled in by Portage.
+Go 1.26.11 or a newer patched release is required and pulled in by Portage.
 
 Also made here: [Arise](https://github.com/airencracken/arise), experimental
 Gentoo package tooling in Go. It brings package search, dependency resolution,

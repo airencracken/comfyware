@@ -30,7 +30,7 @@ RDEPEND="
 	app-misc/ca-certificates
 "
 BDEPEND+="
-	>=dev-lang/go-1.26.0
+	>=dev-lang/go-1.26.11
 	acct-group/witmoot
 	acct-user/witmoot
 	test? ( app-admin/logrotate )

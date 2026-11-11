@@ -31,7 +31,7 @@ RDEPEND="
 	app-misc/ca-certificates
 "
 BDEPEND+="
-	>=dev-lang/go-1.26.0
+	>=dev-lang/go-1.26.11
 	acct-group/songstead
 	acct-user/songstead
 	test? ( app-admin/logrotate )
