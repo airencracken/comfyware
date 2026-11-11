@@ -11,7 +11,7 @@ HOMEPAGE="https://github.com/airencracken/folkweave"
 EGIT_REPO_URI="https://github.com/airencracken/folkweave.git"
 EGIT_BRANCH="master"
 
-LICENSE="AGPL-3+ 0BSD BSD BSD-2 MIT public-domain"
+LICENSE="AGPL-3+ Apache-2.0 0BSD BSD BSD-2 MIT public-domain"
 SLOT="0"
 # go-module_live_vendor refuses to run without this.
 PROPERTIES="live"

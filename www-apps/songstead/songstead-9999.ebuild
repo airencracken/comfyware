@@ -13,7 +13,7 @@ EGIT_BRANCH="master"
 
 # Songstead uses AGPL-3.0-or-later. The remaining entries cover the linked
 # Go dependencies, their bundled code, and the embedded HTMX asset.
-LICENSE="AGPL-3+ 0BSD BSD BSD-2 MIT public-domain"
+LICENSE="AGPL-3+ Apache-2.0 0BSD BSD BSD-2 MIT public-domain"
 SLOT="0"
 # go-module_live_vendor refuses to run without this.
 PROPERTIES="live"
