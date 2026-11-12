@@ -9,7 +9,7 @@ recipes=importlib.util.module_from_spec(spec);spec.loader.exec_module(recipes)
 
 class InitialAppTests(unittest.TestCase):
     def test_native_recipes_match_and_stamp_versions(self):
-        for app,version in (('folkweave','0.3.4'),('tidings','0.5.4')):
+        for app,version in (('folkweave','0.4.0'),('tidings','0.6.0')):
             package=ROOT/'www-apps'/app
             text=(package/f'{app}-{version}.ebuild').read_text()
             self.assertEqual(recipes.recipe_errors(text),[])

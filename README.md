@@ -5,11 +5,11 @@ and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.22.2` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/songstead` | `0.13.2` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
-| `www-apps/folkweave` | `0.3.4` | [Folkweave](https://github.com/airencracken/folkweave), a private group timeline |
-| `www-apps/tidings` | `0.5.4` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
-| `www-apps/witmoot` | `0.20.2` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
+| `www-apps/imvault` | `0.23.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
+| `www-apps/songstead` | `0.14.0` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
+| `www-apps/folkweave` | `0.4.0` | [Folkweave](https://github.com/airencracken/folkweave), a private group timeline |
+| `www-apps/tidings` | `0.6.0` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
+| `www-apps/witmoot` | `0.21.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
 
 Release ebuilds build the published source archives with checksummed Go dependency
 bundles; compilation does not need network access. The released apps also have **live `9999`
@@ -23,6 +23,18 @@ existing Portage configuration. Find installation instructions in the
 [Arise overlay](https://github.com/airencracken/arise-overlay). The commands below
 use Portage; Arise can work with configured overlays too. Keep Portage installed
 while Arise's compatibility work continues.
+
+## Coordinated releases
+
+`release-catalog.json` records the planned suite versions. Update it with the
+application source metadata, current recipes and website catalog before creating
+tags. Each app's `make release-preflight` verifies a clean commit, published module
+resolution and matching immutable workflow references. The shared `release-plan`
+command also accepts `--catalog ../comfyware/release-catalog.json --suite-root ..`
+to check all five applications, overlay recipes and website versions together.
+The generated plan records source commits and input hashes; `--verify-plan` rejects
+source changes before publication. Release workflows require native, package,
+container and browser gates before publishing artifacts.
 
 ## Add the overlay
 
@@ -86,8 +98,8 @@ www-apps/imvault ffmpeg
 For optional Bubblewrap confinement in Imvault and Witmoot, add `bubblewrap`
 to their USE flags. This installs a non-setuid launcher; enable confinement separately
 in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
-See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.22.2/docs/sandbox.md)
-or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.20.2/docs/sandbox.md)
+See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.23.0/docs/sandbox.md)
+or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.21.0/docs/sandbox.md)
 for OpenRC settings, systemd overrides and verification.
 
 Install the applications you want:
@@ -118,12 +130,12 @@ Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
 are supported by Imvault and Witmoot too. Each app installs proxy examples under
 `/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
 
-- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.22.2/docs/reverse-proxies.md)
-- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.20.2/docs/reverse-proxies.md)
+- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.23.0/docs/reverse-proxies.md)
+- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.21.0/docs/reverse-proxies.md)
 
-- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.22.2/docs/deployment.md)
-- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.20.2/docs/deployment.md)
-- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.13.2/docs/deployment.md)
+- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.23.0/docs/deployment.md)
+- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.21.0/docs/deployment.md)
+- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.14.0/docs/deployment.md)
 
 Run `imvault --help` or `witmoot --help` for commands, environment settings,
 and service paths. Generate a site configuration for your hostname with:
@@ -157,7 +169,7 @@ reads service settings and switches to the service account. Both examples keep
 the newest seven completed snapshots; rotation follows successful verification.
 Change `--keep` to choose another count; manual snapshots never rotate. Keep an
 off-host copy and test restores. See the upstream
-[operations guide](https://github.com/airencracken/imvault/blob/v0.22.2/docs/operations.md).
+[operations guide](https://github.com/airencracken/imvault/blob/v0.23.0/docs/operations.md).
 
 ## Shared Comfylib foundation
 
@@ -211,13 +223,13 @@ then restart the affected service.
 Read each application's release notes before upgrading:
 [Imvault](https://github.com/airencracken/imvault/tree/master/docs/release-notes)
 [Witmoot](https://github.com/airencracken/witmoot/tree/master/docs/release-notes),
-and [Songstead](https://github.com/airencracken/songstead/blob/v0.13.2/CHANGELOG.md).
+and [Songstead](https://github.com/airencracken/songstead/blob/v0.14.0/CHANGELOG.md).
 Imvault 0.20.0 adds migrations 033 and 034 for private 30-day Trash and camera-date
 browsing. Back up with the currently installed binary before upgrading; returning
 to an older binary requires its matching pre-upgrade database. Owner API deletion
 now moves files to Trash, which retains quota until permanent deletion. See the
-[Imvault release notes](https://github.com/airencracken/imvault/blob/v0.22.2/docs/release-notes/0.20.0.md)
-and [library guide](https://github.com/airencracken/imvault/blob/v0.22.2/docs/library.md).
+[Imvault release notes](https://github.com/airencracken/imvault/blob/v0.23.0/docs/release-notes/0.20.0.md)
+and [library guide](https://github.com/airencracken/imvault/blob/v0.23.0/docs/library.md).
 
 Witmoot schema upgrades cannot be undone, so back up the entire stopped data
 directory first. Keep all OpenRC configuration files at mode 0600; they can
@@ -308,7 +320,7 @@ boards stay out. Edits retain their original position.
 
 Migration 020 adds an index without rewriting messages. Keep a verified pre-upgrade
 backup; older binaries require the matching pre-upgrade database. Read the
-[Witmoot 0.18.0 release notes](https://github.com/airencracken/witmoot/blob/v0.20.2/docs/release-notes/0.18.0.md)
+[Witmoot 0.18.0 release notes](https://github.com/airencracken/witmoot/blob/v0.21.0/docs/release-notes/0.18.0.md)
 before upgrading.
 
 ## Songstead and discussion links
@@ -334,8 +346,8 @@ For scripts, use `--password-stdin` with protected standard input instead. Accou
 commands discover the installed service configuration and root invocations run
 as the configured service user. Restart the updated server before provisioning
 on an existing instance. Back up `/var/lib/songstead` before upgrades; startup applies
-forward migrations. Follow the [installation guide](https://github.com/airencracken/songstead/blob/v0.13.2/docs/releases.md)
-and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.13.2/docs/deployment.md)
+forward migrations. Follow the [installation guide](https://github.com/airencracken/songstead/blob/v0.14.0/docs/releases.md)
+and [Gentoo deployment](https://github.com/airencracken/songstead/blob/v0.14.0/docs/deployment.md)
 for accounts, service settings and Caddy.
 
 Witmoot 0.18.0 accepts explicit discussion drafts from Songstead recommendations
@@ -356,7 +368,7 @@ checking release/live parity, version stamps and exact Manifest entries.
 Songstead also supports the optional `bubblewrap` USE flag. Enable its launcher
 with `SONGSTEAD_SANDBOX="true"` in OpenRC, or install the systemd drop-in from
 `examples/systemd/songstead-sandbox.conf`. Run `songstead sandbox --check` as the
-service user before restarting. See [Songstead sandbox setup](https://github.com/airencracken/songstead/blob/v0.13.2/docs/sandbox.md).
+service user before restarting. See [Songstead sandbox setup](https://github.com/airencracken/songstead/blob/v0.14.0/docs/sandbox.md).
 
 Songstead includes browser administration, invitations and account recovery.
 After upgrading and restarting, sign in as an owner and open Admin. For a
@@ -441,9 +453,9 @@ Snapshots live under the app's private data directory in backups/; copy
 completed snapshots off-host. Allow additional staging space during a backup.
 Recovery and service configuration details:
 
-- [Songstead automatic backups](https://github.com/airencracken/songstead/blob/v0.13.2/docs/automatic-backups.md)
-- [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.20.2/docs/automatic-backups.md)
-- [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.22.2/docs/automatic-backups.md)
+- [Songstead automatic backups](https://github.com/airencracken/songstead/blob/v0.14.0/docs/automatic-backups.md)
+- [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.21.0/docs/automatic-backups.md)
+- [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.23.0/docs/automatic-backups.md)
 
 ## Folkweave and Tidings
 
@@ -521,11 +533,11 @@ values leave the integrations disabled. Existing local accounts, passwords and
 application permissions remain independent. A member must deliberately connect
 an existing account to the identity provider. See each app's suite guide:
 
-- [Imvault](https://github.com/airencracken/imvault/blob/v0.22.2/docs/suite.md)
-- [Witmoot](https://github.com/airencracken/witmoot/blob/v0.20.2/docs/suite.md)
-- [Songstead](https://github.com/airencracken/songstead/blob/v0.13.2/docs/suite.md)
-- [Folkweave](https://github.com/airencracken/folkweave/blob/v0.3.4/docs/suite.md)
-- [Tidings](https://github.com/airencracken/tidings/blob/v0.5.4/docs/suite.md)
+- [Imvault](https://github.com/airencracken/imvault/blob/v0.23.0/docs/suite.md)
+- [Witmoot](https://github.com/airencracken/witmoot/blob/v0.21.0/docs/suite.md)
+- [Songstead](https://github.com/airencracken/songstead/blob/v0.14.0/docs/suite.md)
+- [Folkweave](https://github.com/airencracken/folkweave/blob/v0.4.0/docs/suite.md)
+- [Tidings](https://github.com/airencracken/tidings/blob/v0.6.0/docs/suite.md)
 
 Back up the stopped data directory before upgrading. Songstead builds its schema 11
 search index at startup; allow time for large libraries. Keep the pre-upgrade
