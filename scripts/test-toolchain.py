@@ -42,8 +42,8 @@ class ToolchainTests(unittest.TestCase):
             validate_toolchain('# BDEPEND="\n>=dev-lang/go-1.26.11\n"')
 
     def test_suite_releases_and_live_recipes_cover_oidc_dependency_licenses(self):
-        versions = {'folkweave': '0.4.0', 'imvault': '0.23.0', 'songstead': '0.14.0',
-                    'tidings': '0.6.0', 'witmoot': '0.21.0'}
+        versions = {'folkweave': '0.5.0', 'imvault': '0.24.0', 'songstead': '0.15.0',
+                    'tidings': '0.7.0', 'witmoot': '0.22.0'}
         for app, version in versions.items():
             for release in (version, '9999'):
                 recipe = ROOT / 'www-apps' / app / f'{app}-{release}.ebuild'

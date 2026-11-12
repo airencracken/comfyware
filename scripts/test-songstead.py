@@ -11,9 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("recipes", ROOT / "scripts/test-recipes.py")
 recipes = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(recipes)
-STAGED = ROOT / "release-preparation/songstead-0.14.0.ebuild"
+STAGED = ROOT / "release-preparation/songstead-0.15.0.ebuild"
 LIVE = ROOT / "www-apps/songstead/songstead-9999.ebuild"
-ACTIVE = LIVE.parent / "songstead-0.14.0.ebuild"
+ACTIVE = LIVE.parent / "songstead-0.15.0.ebuild"
 RELEASE = ACTIVE if ACTIVE.exists() else STAGED
 
 
@@ -45,7 +45,7 @@ class SongsteadRecipes(unittest.TestCase):
             self.assertFalse((LIVE.parent / "Manifest").exists())
 
     def test_compile_version_and_accounts(self):
-        for recipe, version in ((RELEASE, "0.14.0"), (LIVE, "9999")):
+        for recipe, version in ((RELEASE, "0.15.0"), (LIVE, "9999")):
             args = recipes.compile_arguments(recipe, "songstead", version)
             recipes.validate_compiled_version(args, version)
             self.assertEqual(args[-1], "./cmd/songstead")
