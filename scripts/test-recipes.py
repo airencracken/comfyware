@@ -309,6 +309,27 @@ def readme_errors(readme, newest):
     return errors
 
 
+# The family's canonical order, as the website lists the apps.
+CANONICAL_APPS = ("imvault", "witmoot", "songstead", "folkweave", "tidings")
+# User steps first, maintainer tooling and side projects last.
+README_ORDER = ("Add the overlay", "Install", "Update", "Maintain", "Coordinated releases", "Also made here")
+
+
+def readme_structure_errors(readme):
+    """Return README layout problems: section order and package table order."""
+    errors = []
+    headings = re.findall(r"^## (.+)$", readme, re.MULTILINE)
+    present = [heading for heading in headings if heading in README_ORDER]
+    if present != list(README_ORDER):
+        errors.append("README sections are out of order: " + ", ".join(present))
+    elif headings[-1] != README_ORDER[-1]:
+        errors.append("README sections are out of order: Also made here must come last")
+    table = re.findall(r"^\| `www-apps/([a-z]+)` \|", readme, re.MULTILINE)
+    if table != list(CANONICAL_APPS):
+        errors.append("package table is not in the family's order: " + ", ".join(table))
+    return errors
+
+
 def prose(markdown):
     """Drop code, link targets, and URLs, where lowercase names are literal."""
     markdown = re.sub(r"```.*?```", "", markdown, flags=re.DOTALL)
@@ -324,6 +345,7 @@ def newest_versions():
 class ReadmeConsistency(unittest.TestCase):
     def test_readme_matches_newest_releases(self):
         self.assertEqual(readme_errors((ROOT / "README.md").read_text(), newest_versions()), [])
+        self.assertEqual(readme_structure_errors((ROOT / "README.md").read_text()), [])
 
     def test_literal_names_are_allowed(self):
         readme = "Run `imvault --help`, see [Imvault](https://github.com/airencracken/imvault).\n"
@@ -332,7 +354,13 @@ class ReadmeConsistency(unittest.TestCase):
     def test_stale_claims_are_rejected(self):
         readme = (ROOT / "README.md").read_text()
         newest = newest_versions()
-        mutations = {"capitalised": readme + "\nInstall imvault first.\n"}
+        mutations = {
+            "capitalised": readme + "\nInstall imvault first.\n",
+            "out of order": readme.replace("## Update\n", "## Later\n", 1).replace("## Coordinated releases\n", "## Update\n", 1),
+            "Also made here must come last": readme + "\n## Afterword\n",
+            "family's order": readme.replace("| `www-apps/imvault` |", "| `www-apps/imvault-moved` |", 1)
+                              + "\n| `www-apps/imvault` | `x` |\n",
+        }
         for app, version in newest.items():
             mutations.update({
                 f"package table: {app}": readme.replace(f"`www-apps/{app}` | `{version}`", f"`www-apps/{app}` | `0.0.1`"),
@@ -342,7 +370,8 @@ class ReadmeConsistency(unittest.TestCase):
             with self.subTest(mutation=mutation):
                 self.assertNotEqual(mutated, readme, "mutation did not apply")
                 expected = mutation.split(":", 1)[0]
-                self.assertTrue(any(expected in error for error in readme_errors(mutated, newest)))
+                found = readme_errors(mutated, newest) + readme_structure_errors(mutated)
+                self.assertTrue(any(expected in error for error in found))
 
 
 LOOPBACK = "127.0.0.1/32,::1/128"
