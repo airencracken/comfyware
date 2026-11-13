@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Validate backup compressor installation and the published operator policy."""
 from pathlib import Path
+import json
 import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"songstead": "0.15.0", "witmoot": "0.22.0", "imvault": "0.24.0"}
+CATALOG = json.loads((ROOT / "release-catalog.json").read_text())["releases"]
+VERSIONS = {app: CATALOG[app] for app in ("songstead", "witmoot", "imvault")}
 
 def errors(text):
     problems = []
@@ -29,7 +31,7 @@ class AutomaticBackupTests(unittest.TestCase):
                     self.assertIn("dodoc -r docs", text)
 
     def test_removing_dependency_or_policy_is_detected(self):
-        text = (ROOT / "www-apps/songstead/songstead-0.15.0.ebuild").read_text()
+        text = (ROOT / "www-apps/songstead" / f"songstead-{VERSIONS['songstead']}.ebuild").read_text()
         for before, after in (("+zstd", "zstd"), ("zstd? ( app-arch/zstd )", ""), ("seven copies", "unlimited copies"), ("10 GiB", "unlimited bytes"), ("off-host", "locally")):
             with self.subTest(before=before):
                 self.assertNotEqual(text, text.replace(before, after))
