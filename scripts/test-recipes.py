@@ -541,11 +541,13 @@ def write_fixture(source, app, bin_default):
 class StagedInstallCheck(unittest.TestCase):
     """The install check must reject the packaging regressions it exists for."""
 
-    def run_check(self, app, text, bin_default):
+    def run_check(self, app, text, bin_default, files=None):
         with tempfile.TemporaryDirectory() as directory:
             work = Path(directory)
             source = work / "source"
             write_fixture(source, app, bin_default)
+            for name, content in (files or {}).items():
+                (source / name).write_text(content)
             recipe = work / app / f"{app}-1.2.3.ebuild"
             recipe.parent.mkdir()
             recipe.write_text(text)
@@ -559,6 +561,27 @@ class StagedInstallCheck(unittest.TestCase):
                 with self.subTest(recipe=recipe.name):
                     result = self.run_check(app, recipe.read_text(), default)
                     self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_historical_systemd_address_syntax_passes(self):
+        for version in ("0.10.0", "0.14.0", "0.18.0", newest_versions()["witmoot"]):
+            recipe = ROOT / "www-apps/witmoot" / f"witmoot-{version}.ebuild"
+            for value in ('127.0.0.1:8082', '"127.0.0.1:8082"'):
+                with self.subTest(version=version, value=value):
+                    result = self.run_check("witmoot", recipe.read_text(), "/usr/local/bin/witmoot",
+                                            {"contrib/systemd/witmoot.env": f"WITMOOT_ADDR={value}\n"})
+                    self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_invalid_systemd_addresses_are_rejected(self):
+        recipe = release_recipes("witmoot")[-1]
+        values = ('"127.0.0.1:8082', '127.0.0.1:8082"', '"0.0.0.0:8082"',
+                  ':8082', '127x0x0x1:8082', '127.0.0.1:8083',
+                  '"127.0.0.1:8082"; touch unexpected')
+        for value in values:
+            with self.subTest(value=value):
+                result = self.run_check("witmoot", recipe.read_text(), "/usr/local/bin/witmoot",
+                                        {"contrib/systemd/witmoot.env": f"WITMOOT_ADDR={value}\n"})
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("systemd environment file does not set the Witmoot address", result.stderr)
 
     def test_mutations_are_caught(self):
         text = release_recipes("witmoot")[-1].read_text()

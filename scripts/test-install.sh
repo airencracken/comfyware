@@ -116,7 +116,8 @@ if [[ $PN == witmoot ]]; then
 	grep -qx 'WITMOOT_ADDR="127.0.0.1:8082"' "$ED/etc/conf.d/witmoot" || fail 'OpenRC configuration does not set the Witmoot address explicitly.'
 	# shellcheck disable=SC2016 # The literal init-script line, not an expansion.
 	grep -qx ': "${WITMOOT_ADDR:=127.0.0.1:8082}"' "$initd" || fail 'OpenRC service does not default the Witmoot address explicitly.'
-	grep -qx 'WITMOOT_ADDR="127.0.0.1:8082"' "$env_file" || fail 'systemd environment file does not set the Witmoot address explicitly.'
+	# Older source releases use the equivalent unquoted systemd value.
+	grep -Eq '^WITMOOT_ADDR=("127\.0\.0\.1:8082"|127\.0\.0\.1:8082)$' "$env_file" || fail 'systemd environment file does not set the Witmoot address explicitly.'
 fi
 if [[ $PN == imvault && -f contrib/systemd/imvault-backup.service ]]; then
 	grep -qx 'ExecStart=/usr/bin/imvault backup --output-dir /var/backups/imvault --keep 7' "$ED/usr/lib/systemd/system/imvault-backup.service" || fail 'Packaged backup command is incorrect.'
