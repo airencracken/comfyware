@@ -3,6 +3,22 @@
 Notes from past overlay releases. Each app's own release notes are the full
 record.
 
+## Palette typography and privacy fixes
+
+Imvault 0.26.1, Witmoot 0.24.1, Songstead 0.17.1, Folkweave 0.7.2 and Tidings
+0.9.1 pin Comfylib 0.7.2. Changing a color palette keeps each app's fonts and
+heading weights.
+
+- Imvault uploads share camera details and location only after an explicit
+  choice, including without JavaScript. Reopening a confirmation dialog keeps
+  the newly selected action.
+- Witmoot calls forum entries posts throughout the interface and exports.
+- Tidings preserves all 13 tags through export and restore, including entries
+  migrated from a topic with 12 tags. Invalid imports fail before changing data.
+
+These patches add no database migrations. Upgrading from an earlier release
+still applies the migrations described below.
+
 ## Site health metrics, palettes and Comfylib 0.7.1
 
 Imvault 0.26.0, Witmoot 0.24.0, Songstead 0.17.0, Folkweave 0.7.1 and Tidings
