@@ -226,8 +226,7 @@ files to Trash, which counts against quota until permanent deletion. See the
 [Imvault 0.20.0 release notes](https://github.com/airencracken/imvault/blob/v0.25.0/docs/release-notes/0.20.0.md).
 
 Witmoot schema upgrades cannot be undone, so back up the stopped data directory
-first. The [September 2026 audit](AUDIT-2026-09-29.md) describes the fixes in
-Imvault 0.10.1 and Witmoot 0.7.3.
+first.
 
 Folkweave 0.1.1 and Tidings 0.2.0 were the first packaged releases of those apps.
 
