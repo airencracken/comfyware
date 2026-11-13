@@ -1,27 +1,25 @@
 # comfyware
 
-Gentoo packages for Imvault, Witmoot, Songstead, Folkweave and Tidings: apps you can host for friends, family,
+Gentoo packages for the Comfyware apps, which you can host for friends, family
 and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.25.0` | [Imvault](https://github.com/airencracken/imvault), a home for your group's photos and clips |
-| `www-apps/witmoot` | `0.23.0` | [Witmoot](https://github.com/airencracken/witmoot), a small bulletin board for friends and family |
-| `www-apps/songstead` | `0.16.0` | [Songstead](https://github.com/airencracken/songstead), a quiet music recommendation shelf |
-| `www-apps/folkweave` | `0.6.0` | [Folkweave](https://github.com/airencracken/folkweave), a private group timeline |
-| `www-apps/tidings` | `0.8.0` | [Tidings](https://github.com/airencracken/tidings), an RSS and Atom reader |
+| `www-apps/imvault` | `0.25.0` | [Imvault](https://github.com/airencracken/imvault): photos and short clips |
+| `www-apps/witmoot` | `0.23.0` | [Witmoot](https://github.com/airencracken/witmoot): a bulletin board |
+| `www-apps/songstead` | `0.16.0` | [Songstead](https://github.com/airencracken/songstead): music recommendations |
+| `www-apps/folkweave` | `0.6.0` | [Folkweave](https://github.com/airencracken/folkweave): a private group timeline |
+| `www-apps/tidings` | `0.8.0` | [Tidings](https://github.com/airencracken/tidings): an RSS and Atom reader |
 
-Release ebuilds build the published source archives with checksummed Go dependency
-bundles; compilation does not need network access. The released apps also have **live `9999`
-ebuilds** that build upstream `master` and fetch dependencies during unpack.
-Go 1.26.11 or a newer patched release is required and pulled in by Portage.
+Release ebuilds build the published source with a checksummed bundle of Go
+dependencies, so the build needs no network. Each app also has a live `9999`
+ebuild that builds upstream `master`. Portage pulls in Go 1.26.11 or newer.
 
-Release-by-release notes for the packages live in
-[RELEASE-HISTORY.md](RELEASE-HISTORY.md).
+Past release notes are in [RELEASE-HISTORY.md](RELEASE-HISTORY.md).
 
 ## Add the overlay
 
-Run these commands as root:
+As root:
 
 ```sh
 emerge --ask app-eselect/eselect-repository dev-vcs/git
@@ -29,9 +27,8 @@ eselect repository add comfyware git https://github.com/airencracken/comfyware.g
 emaint sync -r comfyware
 ```
 
-This is a custom overlay; it does not need to be in Gentoo's central repository
-list. If you manage `repos.conf` yourself, use this instead in
-`/etc/portage/repos.conf/comfyware.conf`:
+If you manage `repos.conf` yourself, put this in
+`/etc/portage/repos.conf/comfyware.conf` and run `emaint sync -r comfyware`:
 
 ```ini
 [comfyware]
@@ -41,262 +38,160 @@ sync-uri = https://github.com/airencracken/comfyware.git
 auto-sync = yes
 ```
 
-Then run `emaint sync -r comfyware`.
-
 ## Install
 
-The packages currently use testing keywords for amd64 and arm64. Add the following to
-`/etc/portage/package.accept_keywords/comfyware` (create the parent directory
-if your configuration uses directories):
+The packages use testing keywords on amd64 and arm64. Add the lines for the
+apps you want to `/etc/portage/package.accept_keywords/comfyware`:
 
 ```text
 www-apps/imvault::comfyware ~*
+acct-user/imvault::comfyware ~*
+acct-group/imvault::comfyware ~*
 www-apps/witmoot::comfyware ~*
+acct-user/witmoot::comfyware ~*
+acct-group/witmoot::comfyware ~*
 www-apps/songstead::comfyware ~*
+acct-user/songstead::comfyware ~*
+acct-group/songstead::comfyware ~*
 www-apps/folkweave::comfyware ~*
 acct-user/folkweave::comfyware ~*
 acct-group/folkweave::comfyware ~*
 www-apps/tidings::comfyware ~*
 acct-user/tidings::comfyware ~*
 acct-group/tidings::comfyware ~*
-acct-user/imvault::comfyware ~*
-acct-group/imvault::comfyware ~*
-acct-user/witmoot::comfyware ~*
-acct-group/witmoot::comfyware ~*
-acct-user/songstead::comfyware ~*
-acct-group/songstead::comfyware ~*
 ```
 
-Keep the lines for the applications you install. `~*` accepts their testing
-keywords while leaving unkeyworded live builds disabled. Review any additional
-keyword or license changes Portage requests for dependencies.
+`~*` accepts the testing keywords and leaves the live builds off.
 
-For video thumbnails and duration checks, add this to
-`/etc/portage/package.use/comfyware`:
+Optional USE flags, in `/etc/portage/package.use/comfyware`:
 
-```text
-www-apps/imvault ffmpeg
-```
+- `ffmpeg` on Imvault makes video thumbnails and enforces clip length.
+- `bubblewrap` on Imvault, Witmoot or Songstead installs a non-setuid launcher
+  for service confinement. Turn it on in the service settings; see the
+  [Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/sandbox.md),
+  [Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/sandbox.md) or
+  [Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/sandbox.md)
+  guide. Imvault's media sandbox also needs `ffmpeg`.
+- `zstd` is on by default and compresses backups. Without it, the apps use
+  built-in gzip.
 
-For optional Bubblewrap confinement in Imvault and Witmoot, add `bubblewrap`
-to their USE flags. This installs a non-setuid launcher; enable confinement separately
-in the service settings. Imvault's stricter media sandbox also needs `ffmpeg`.
-See the [Imvault setup](https://github.com/airencracken/imvault/blob/v0.25.0/docs/sandbox.md)
-or [Witmoot setup](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/sandbox.md)
-for OpenRC settings, systemd overrides and verification.
-
-Install the applications you want:
+Install:
 
 ```sh
 emerge --ask www-apps/imvault::comfyware www-apps/witmoot::comfyware www-apps/songstead::comfyware www-apps/folkweave::comfyware www-apps/tidings::comfyware
 ```
 
-The packages provide dedicated service accounts, `/usr/bin` binaries, OpenRC
-and systemd service definitions, configuration files, and logrotate rules.
-They do not enable or start services for you.
+Each package adds a service account, a `/usr/bin` binary, OpenRC and systemd
+services, a configuration file and a logrotate rule. Nothing starts on its own.
 
-| Application | OpenRC configuration | systemd configuration | Data directory |
-| --- | --- | --- | --- |
-| Imvault | `/etc/conf.d/imvault` | `/etc/imvault/imvault.env` | `/var/lib/imvault` |
-| Witmoot | `/etc/conf.d/witmoot` | `/etc/witmoot/witmoot.env` | `/var/lib/witmoot` |
-| Songstead | `/etc/conf.d/songstead` | `/etc/songstead/songstead.env` | `/var/lib/songstead` |
-| Folkweave | `/etc/conf.d/folkweave` | `/etc/folkweave/folkweave.env` | `/var/lib/folkweave` |
-| Tidings | `/etc/conf.d/tidings` | `/etc/tidings/tidings.env` | `/var/lib/tidings` |
+| App | OpenRC config | systemd config | Data | Listens on |
+| --- | --- | --- | --- | --- |
+| Imvault | `/etc/conf.d/imvault` | `/etc/imvault/imvault.env` | `/var/lib/imvault` | set `IMVAULT_ADDR="127.0.0.1:8080"` |
+| Witmoot | `/etc/conf.d/witmoot` | `/etc/witmoot/witmoot.env` | `/var/lib/witmoot` | `127.0.0.1:8082` |
+| Songstead | `/etc/conf.d/songstead` | `/etc/songstead/songstead.env` | `/var/lib/songstead` | `127.0.0.1:8083` |
+| Folkweave | `/etc/conf.d/folkweave` | `/etc/folkweave/folkweave.env` | `/var/lib/folkweave` | `127.0.0.1:8084` |
+| Tidings | `/etc/conf.d/tidings` | `/etc/tidings/tidings.env` | `/var/lib/tidings` | `127.0.0.1:8085` |
 
-Configure your hostname and reverse proxy, and provision the administrator or
-owner before starting. Set `IMVAULT_ADDR="127.0.0.1:8080"` in Imvault's service
-configuration; Witmoot's native service defaults to `127.0.0.1:8082`.
-Songstead defaults to `127.0.0.1:8083`, Folkweave to `127.0.0.1:8084`, and Tidings to `127.0.0.1:8085`. Use the packaged `/usr/bin` binaries
-in provisioning commands.
+Write settings as `KEY="value"`, without `export`; see the
+[shared configuration format](https://github.com/airencracken/comfylib/blob/master/docs/configuration.md).
+Keep OpenRC files at mode 0600, since they can hold mail passwords.
 
-Caddy is the recommended reverse proxy, with automatic HTTPS. nginx and Apache
-are supported by Imvault and Witmoot too. Each app installs proxy examples under
-`/usr/share/doc/PACKAGE-VERSION/examples/`, alongside their deployment guides:
+### Set up
 
-- [Imvault proxy setup](https://github.com/airencracken/imvault/blob/v0.25.0/docs/reverse-proxies.md)
-- [Witmoot proxy setup](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/reverse-proxies.md)
+1. Set your hostname and put an HTTPS reverse proxy in front. Caddy is the
+   easiest. Examples for each app are in
+   `/usr/share/doc/PACKAGE-VERSION/examples/`. Imvault, Witmoot and Tidings
+   can print a config for your domain:
 
-- [Imvault deployment and administrator setup](https://github.com/airencracken/imvault/blob/v0.25.0/docs/deployment.md)
-- [Witmoot deployment and owner setup](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/deployment.md)
-- [Songstead deployment and account setup](https://github.com/airencracken/songstead/blob/v0.16.0/docs/deployment.md)
+   ```sh
+   imvault proxy-config caddy --domain img.example.com > imvault.Caddyfile
+   ```
 
-Run `imvault --help` or `witmoot --help` for commands, environment settings,
-and service paths. Generate a site configuration for your hostname with:
+   Swap `caddy` for `nginx` or `apache` if you prefer.
+2. Start the service:
+   `rc-update add APP default && rc-service APP start` on OpenRC, or
+   `systemctl enable --now APP` on systemd.
+3. Create the first owner. Run `APP setup` for a private browser setup key, or
+   `APP create-owner --username NAME` to set a password in the terminal.
+   `APP set-password --username NAME` resets a password and signs out old
+   sessions. Run these as root; they switch to the service account.
+   `--password-stdin`, `--password-file PATH` and `--data-dir DIRECTORY` help
+   with scripts.
 
-```sh
-imvault proxy-config caddy --domain img.example.com > imvault.Caddyfile
-witmoot proxy-config caddy --domain board.example.org > witmoot.Caddyfile
-```
+Each app's deployment guide has the details:
+[Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/deployment.md),
+[Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/deployment.md),
+[Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/deployment.md),
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.6.0/docs/deployment.md),
+[Tidings](https://github.com/airencracken/tidings/blob/v0.8.0/docs/deployment.md).
 
-Substitute `nginx` or `apache` for either helper. These commands print a config
-and the matching application settings; follow the proxy guide to install it.
+OpenRC logs go to `/var/log/APP.log` and logrotate rotates them; keep its cron
+job or timer on. Under systemd, logs go to the journal.
 
-For OpenRC, enable your configured service with `rc-update add imvault default`
-and start it with `rc-service imvault start`; substitute `witmoot` or `songstead`
-for the other applications.
-For systemd, use `systemctl enable --now APPLICATION`.
-OpenRC logs go to `/var/log/imvault.log`, `/var/log/witmoot.log`, and
-`/var/log/songstead.log`. The ebuilds
-depend on `app-admin/logrotate` and install each rule in `/etc/logrotate.d/`.
-Keep logrotate's cron job or timer enabled. All three systemd units explicitly send
-stdout and stderr to journald, which handles rotation and retention.
+### Backups
 
-### Optional Imvault backups
+Every app backs itself up while it runs. The first backup starts a minute after
+startup, then every 24h. Each app keeps seven copies, up to 10 GiB of archives,
+with a 5 GiB cap on each uncompressed snapshot. Owners see the results in
+the app's settings (instance settings in Imvault, Witmoot and Songstead). Snapshots land in `backups/` under the data directory; copy
+them off-host.
 
-Imvault 0.13 can take verified snapshots while browsing and uploads continue.
-Create `/var/backups/imvault` with mode 0700, owned by the service account. On
-systemd, enable `imvault-backup.timer`. For OpenRC, copy the uncompressed
-`examples/cron/imvault-backup` from the package documentation into `/etc/cron.d/`,
-mode 0644. Enable one scheduler; installation enables neither. The root-run CLI
-reads service settings and switches to the service account. Both examples keep
-the newest seven completed snapshots; rotation follows successful verification.
-Change `--keep` to choose another count; manual snapshots never rotate. Keep an
-off-host copy and test restores. See the upstream
+To change the schedule, set `APP_BACKUP_INTERVAL` (0 turns it off),
+`APP_BACKUP_KEEP`, `APP_BACKUP_MAX_BYTES` or `APP_BACKUP_COPY_MAX_BYTES`, with
+`APP` as the app's name in capitals. Restore steps are in each guide:
+[Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/automatic-backups.md),
+[Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/automatic-backups.md),
+[Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/automatic-backups.md),
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.6.0/docs/automatic-backups.md),
+[Tidings](https://github.com/airencracken/tidings/blob/v0.8.0/docs/automatic-backups.md).
+
+Imvault can also write extra verified snapshots to another directory. Create
+`/var/backups/imvault` (mode 0700, owned by `imvault`), then enable
+`imvault-backup.timer` on systemd, or copy `examples/cron/imvault-backup` into
+`/etc/cron.d/` (mode 0644) on OpenRC. Neither is on by default. Both keep seven
+snapshots; change `--keep` for another count. See the
 [operations guide](https://github.com/airencracken/imvault/blob/v0.25.0/docs/operations.md).
 
-## Automatic compressed backups
+### Connect the apps
 
-Songstead 0.11.0, Witmoot 0.18.0 and Imvault 0.20.0 create verified backups
-automatically while running. The first attempt starts one minute after service
-startup, then every 24h, remembering successful backups across restarts.
-Comfylib 0.1.6 shares scheduling, compression, private publication and rotation.
-
-Backups use zstd when available and built-in gzip otherwise. The default-enabled
-`zstd` USE flag installs app-arch/zstd; disabling the flag permits the gzip
-fallback when zstd is absent. No timer or cron job is required.
-
-Each app keeps up to seven copies within a 10 GiB cap on compressed archive data.
-The uncompressed snapshot copy cap is 5 GiB. Settings are configurable through
-APP_BACKUP_INTERVAL, APP_BACKUP_KEEP, APP_BACKUP_MAX_BYTES and
-APP_BACKUP_COPY_MAX_BYTES, replacing APP with the uppercase application name.
-An interval of 0 disables the built-in schedule. Manual backups and Imvault's
-external cron/timer destinations are independent of these caps.
-
-Owners see success, failures and caps on the existing instance settings page.
-Snapshots live under the app's private data directory in backups/; copy
-completed snapshots off-host. Allow additional staging space during a backup.
-Recovery and service configuration details:
-
-- [Songstead automatic backups](https://github.com/airencracken/songstead/blob/v0.16.0/docs/automatic-backups.md)
-- [Witmoot automatic backups](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/automatic-backups.md)
-- [Imvault automatic backups](https://github.com/airencracken/imvault/blob/v0.25.0/docs/automatic-backups.md)
-
-## Folkweave and Tidings
-
-Folkweave 0.1.1 and Tidings 0.2.0 are released applications, each with a
-live 9999 recipe and a dedicated service account. Install `www-apps/folkweave`
-or `www-apps/tidings` after adding their `~*` keyword and those of their matching
-`acct-user` and `acct-group` packages, as for the other apps above.
-
-Folkweave uses `/var/lib/folkweave` and localhost port **8084**. Configure
-`/etc/conf.d/folkweave` (OpenRC) or `/etc/folkweave/folkweave.env` (systemd), then
-run `folkweave init --username owner --name "Your name" --title "Our group"`.
-It has one invited group-wide audience. Parental approval controls remain future
-work; shared photographs are normalized copies, so keep originals separately.
-
-Tidings uses `/var/lib/tidings` and localhost port **8085**, avoiding Songstead's
-8083. Configure `/etc/conf.d/tidings` or `/etc/tidings/tidings.env`, then run
-`tidings create-owner --username owner`. Individual subscriptions and reading
-state stay personal. The shared household reading table is opt-in.
-
-Run installed administrative commands as root to re-execute as the configured
-service account. Configure HTTPS before inviting members, then enable/start
-the matching OpenRC or systemd service. Both apps make verified automatic
-backups, and support manual backup and restoration into a fresh directory.
-Their source downloads, containers, documentation and Ko-fi support links live
-at [Folkweave](https://github.com/airencracken/folkweave) and
-[Tidings](https://github.com/airencracken/tidings).
-
-The OpenRC scripts pass supported ordinary `APP_*=value` assignments from
-`/etc/conf.d/folkweave` and `/etc/conf.d/tidings` to the service; `export` is optional.
-Tidings owners manage suggested-source categories, invitations, and immediate
-instance-wide feed fetching from their account. Suggested categories begin
-disabled, including on upgrade, and never change existing subscriptions.
-
-## Common first-run setup
-
-The current releases share browser and command-line account setup. Start the
-configured service and run `APP setup` to retrieve its private browser setup key,
-or run `APP create-owner --username NAME` for a hidden, confirmed terminal prompt.
-Use `APP set-password --username NAME` for recovery; it revokes earlier sessions.
-Root invocations use the configured service account. `--password-stdin`,
-`--password-file PATH`, and `--data-dir DIRECTORY` work across all five apps.
-
-## Service configuration format
-
-All five apps ship service config values as `KEY="value"`, including numeric,
-boolean, and empty values. OpenRC uses `/etc/conf.d/APP`; systemd uses
-`/etc/APP/APP.env`. Every template identifies its manager and installed path.
-Use ordinary assignments without `export` and restart the matching service.
-Existing bare or single-quoted settings remain supported; Portage preserves
-local configuration through its normal config protection.
-
-See the [shared configuration convention](https://github.com/airencracken/comfylib/blob/master/docs/configuration.md).
-
-## Optional suite integrations
-
-The current releases support explicitly configured app links and community sign-in.
-Native service configuration and Compose forward the optional settings; empty
-values leave the integrations disabled. Existing local accounts, passwords and
-application permissions remain independent. A member must deliberately connect
-an existing account to the identity provider. See each app's suite guide:
-
-- [Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/suite.md)
-- [Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/suite.md)
-- [Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/suite.md)
-- [Folkweave](https://github.com/airencracken/folkweave/blob/v0.6.0/docs/suite.md)
-- [Tidings](https://github.com/airencracken/tidings/blob/v0.8.0/docs/suite.md)
-
-Back up the stopped data directory before upgrading. Songstead builds its schema 11
-search index at startup; allow time for large libraries. Keep the pre-upgrade
-backup for a downgrade. Shared sign-in adds an identity-binding table when enabled.
-
-The shared-maintenance releases use published Comfylib 0.3.0 and its separately
-versioned OIDC adapter 0.1.0. Application source imports the suite package and
-serves the embedded shared assets directly. Maintenance commands resolve the
-exact module pin, including from the offline dependency bundle.
+The apps can link to each other and share a community sign-in. Both are off
+until you configure them, and accounts stay separate. See the suite guides for
+[Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/suite.md),
+[Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/suite.md),
+[Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/suite.md),
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.6.0/docs/suite.md) and
+[Tidings](https://github.com/airencracken/tidings/blob/v0.8.0/docs/suite.md).
 
 ## Update
 
-Back up application data before upgrades. Sync the overlay and update the
-installed packages:
+Back up first. Upgrades can migrate the database, and going back needs the
+backup made before the upgrade. Then:
 
 ```sh
 emaint sync -r comfyware
 emerge --ask --update www-apps/imvault::comfyware www-apps/witmoot::comfyware www-apps/songstead::comfyware www-apps/folkweave::comfyware www-apps/tidings::comfyware
 ```
 
-Review protected configuration changes with `dispatch-conf` or `etc-update`,
-then restart the affected service.
+Merge configuration changes with `dispatch-conf` or `etc-update`, then restart
+the service. Each app's release notes are on its GitHub releases page:
+[Imvault](https://github.com/airencracken/imvault/releases),
+[Witmoot](https://github.com/airencracken/witmoot/releases),
+[Songstead](https://github.com/airencracken/songstead/releases),
+[Folkweave](https://github.com/airencracken/folkweave/releases),
+[Tidings](https://github.com/airencracken/tidings/releases).
 
-Read each application's release notes before upgrading:
-[Imvault](https://github.com/airencracken/imvault/tree/master/docs/release-notes)
-[Witmoot](https://github.com/airencracken/witmoot/tree/master/docs/release-notes),
-and [Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/CHANGELOG.md).
-Imvault 0.20.0 adds migrations 033 and 034 for private 30-day Trash and camera-date
-browsing. Back up with the currently installed binary before upgrading; returning
-to an older binary requires its matching pre-upgrade database. Owner API deletion
-now moves files to Trash, which retains quota until permanent deletion. See the
-[Imvault release notes](https://github.com/airencracken/imvault/blob/v0.25.0/docs/release-notes/0.20.0.md)
-and [library guide](https://github.com/airencracken/imvault/blob/v0.25.0/docs/library.md).
+Imvault moved from `app-admin/imvault` to `www-apps/imvault`. Portage applies
+the [package move](https://devmanual.gentoo.org/ebuild-maintenance/package-moves/)
+on sync. Replace any leftover `app-admin/imvault` entries in your `package.*`
+files, including ones ending in `::comfyware`. Paths and data stay the same.
 
-Witmoot schema upgrades cannot be undone, so back up the entire stopped data
-directory first. Keep all OpenRC configuration files at mode 0600; they can
-contain SMTP credentials. The [September 2026 audit](AUDIT-2026-09-29.md)
-describes the fixes in Imvault 0.10.1 and Witmoot 0.7.3.
+Coming from a hand-made overlay? Remove its duplicate recipes, keep your
+configuration and data, and point your service at `/usr/bin` instead of
+`/usr/local/bin`.
 
-Imvault moved from `app-admin/imvault` to `www-apps/imvault`. The overlay includes
-a [package move](https://devmanual.gentoo.org/ebuild-maintenance/package-moves/)
-so Portage can update installed-package records and package references. After
-syncing, review any proposed updates to your `package.*` configuration files.
-Replace remaining `app-admin/imvault` entries with `www-apps/imvault`, including
-entries ending in `::comfyware` in `package.accept_keywords`; Portage may leave
-those repository-qualified entries unchanged.
-The service, configuration paths, and application data stay in the same places.
+### Live builds
 
-### Opt into live builds
-
-To follow upstream `master`, additionally accept the exact live versions:
+To follow upstream `master`, also accept the live versions:
 
 ```text
 =www-apps/imvault-9999::comfyware **
@@ -306,77 +201,57 @@ To follow upstream `master`, additionally accept the exact live versions:
 =www-apps/tidings-9999::comfyware **
 ```
 
-Then explicitly rebuild with `emerge --ask --oneshot =www-apps/imvault-9999::comfyware`
-or the corresponding Witmoot or Songstead live package. The version stays `9999` when upstream changes,
-so a normal version-based world update may not rebuild it. Remove these keyword
-entries to return to released versions. If you previously used an unversioned
-`**` entry for these applications, replace it with the release entries above.
-
-If migrating from a hand-made overlay, remove its duplicate recipes after
-switching to `::comfyware`. Keep your existing configuration and data, and
-check that your service uses `/usr/bin` if it previously used a `make install`
-binary under `/usr/local/bin`.
+The version stays `9999`, so a world update won't rebuild it. Rebuild with
+`emerge --ask --oneshot =www-apps/APP-9999::comfyware`. Remove these lines to go
+back to releases.
 
 ## Maintain
 
-Run `pkgcheck scan --exit error`, `bash scripts/test-make-deps.sh`,
-`shellcheck scripts/*.sh`, and each `python3 scripts/test-*.py` from this
-checkout. `scripts/test-recipes.py` keeps each live ebuild identical to its
-newest release apart from the source, and rejects pre-stripped binaries,
-compressed proxy examples, and install-check regressions. GitHub Actions also
-checks ebuild syntax, verifies downloaded release sources against the Manifest
-with `scripts/verify-distfile.py`, stages service and logging installation, and
-runs pkgcheck on pushes and pull requests. The install check can run locally with
-`bash scripts/test-install.sh EBUILD SOURCE_DIRECTORY`; it uses an unprivileged
-staging directory and leaves account ownership checks to Portage. Enable the `test`
-USE flag for Witmoot and Songstead's upstream Go tests; Imvault also provides `src_test` for
-Portage's `FEATURES=test`. Full emerge and service checks belong in a disposable
-Gentoo installation, since account packages create real users and groups.
-
-The initial recipes come from each project's `contrib/gentoo` directory.
-This repository is the installable overlay; review service and dependency
-changes upstream when updating its recipes.
-
-For a new version, download and verify the upstream source release, then create
-its dependency bundle, for example:
+Run the checks from this checkout:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.21.1 imvault_0.21.1_source.tar.gz /tmp/comfyware-distfiles
+pkgcheck scan --exit error
+shellcheck scripts/*.sh
+bash scripts/test-make-deps.sh
+for test in scripts/test-*.py; do python3 "$test" || echo "FAILED: $test"; done
 ```
 
-The helper verifies modules and refuses to overwrite an existing bundle.
-It disables Go workspaces so a sibling development checkout cannot supply
-unpublished dependencies in place of the release's modules.
-Publish the bundle under the matching `imvault-0.21.1`, `witmoot-0.19.1`, or `songstead-0.12.1` tag in this
-repository's GitHub Releases. Update the release ebuild and generate its Manifest
-with `ebuild path/to/package-version.ebuild manifest`. Verify unpack, compilation,
-and tests with Portage before publishing. Keep existing distfiles immutable.
+`bash scripts/test-install.sh EBUILD SOURCE_DIRECTORY` stages one install
+without root. Enable the `test` USE flag, or `FEATURES=test` for Imvault, to run
+upstream Go tests. Test full installs in a throwaway Gentoo system, because the
+account packages create real users.
 
-Packaging is licensed under **AGPL-3.0-or-later**; see [LICENSE](LICENSE).
-Each application's ebuild records its own and its linked dependencies' licenses.
+For a new version, verify the upstream source release, then build its
+dependency bundle:
 
-To check the funding links GitHub recognizes and the public repository sidebars,
-run `python3 scripts/test-github-funding.py --live` with an authenticated `gh`.
-Both a funding file and an enabled Sponsorships setting are required.
+```sh
+bash scripts/make-deps.sh imvault 0.25.0 imvault_0.25.0_source.tar.gz /tmp/comfyware-distfiles
+```
+
+Publish the bundle under the matching tag (`imvault-0.25.0`) in this
+repository's GitHub Releases. Update the ebuild, run
+`ebuild path/to/package-version.ebuild manifest`, and build it with Portage.
+Never replace a published distfile.
+
+`python3 scripts/test-github-funding.py --live` checks the funding links GitHub
+shows; it needs an authenticated `gh`.
+
+Packaging is licensed under **AGPL-3.0-or-later**; see [LICENSE](LICENSE). Each
+ebuild lists the licenses of its app and linked dependencies.
 
 ## Coordinated releases
 
-`release-catalog.json` records the planned suite versions. Update it with the
-application source metadata, current recipes and website catalog before creating
-tags. Each app's `make release-preflight` verifies a clean commit, published module
-resolution and matching immutable workflow references. The shared `release-plan`
-command also accepts `--catalog ../comfyware/release-catalog.json --suite-root ..`
-to check all five applications, overlay recipes and website versions together.
-The generated plan records source commits and input hashes; `--verify-plan` rejects
-source changes before publication. Release workflows require native, package,
-container and browser gates before publishing artifacts.
+`release-catalog.json` records the suite's versions. Update it, the recipes and
+the website catalog before tagging. Each app's `make release-preflight` checks
+one app. The shared `release-plan` command with
+`--catalog ../comfyware/release-catalog.json --suite-root ..` checks all five
+apps, these recipes and the website together, and `--verify-plan` refuses
+source changes made after planning.
 
 ## Also made here
 
-Also made here: [Arise](https://github.com/airencracken/arise), experimental
-Gentoo package tooling in Go. It brings package search, dependency resolution,
-repository sync, builds, and recovery tools together in one binary, using your
-existing Portage configuration. Find installation instructions in the
-[Arise overlay](https://github.com/airencracken/arise-overlay). The commands below
-use Portage; Arise can work with configured overlays too. Keep Portage installed
-while Arise's compatibility work continues.
+[Arise](https://github.com/airencracken/arise) is experimental Gentoo package
+tooling in Go: search, dependency resolution, sync, builds and recovery in one
+binary, using your Portage configuration. Install it from the
+[Arise overlay](https://github.com/airencracken/arise-overlay), and keep
+Portage installed while it matures.

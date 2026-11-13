@@ -324,6 +324,10 @@ def readme_structure_errors(readme):
         errors.append("README sections are out of order: " + ", ".join(present))
     elif headings[-1] != README_ORDER[-1]:
         errors.append("README sections are out of order: Also made here must come last")
+    # Release-by-release notes belong in RELEASE-HISTORY.md, not the install guide.
+    names = "|".join(name.capitalize() for name in CANONICAL_APPS)
+    for note in re.findall(rf"\b(?:{names}) [0-9]+\.[0-9]+(?:\.[0-9]+)?\b", prose(readme)):
+        errors.append(f"release note in README: {note}")
     table = re.findall(r"^\| `www-apps/([a-z]+)` \|", readme, re.MULTILINE)
     if table != list(CANONICAL_APPS):
         errors.append("package table is not in the family's order: " + ", ".join(table))
@@ -358,6 +362,7 @@ class ReadmeConsistency(unittest.TestCase):
             "capitalised": readme + "\nInstall imvault first.\n",
             "out of order": readme.replace("## Update\n", "## Later\n", 1).replace("## Coordinated releases\n", "## Update\n", 1),
             "Also made here must come last": readme + "\n## Afterword\n",
+            "release note in README": readme.replace("## Update\n", "## Update\n\nWitmoot 0.18.4 refreshes replies.\n", 1),
             "family's order": readme.replace("| `www-apps/imvault` |", "| `www-apps/imvault-moved` |", 1)
                               + "\n| `www-apps/imvault` | `x` |\n",
         }

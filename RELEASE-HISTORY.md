@@ -1,7 +1,7 @@
 # Release history
 
-Feature notes from past overlay releases, moved out of the README. Each
-application's own release notes are the full record.
+Notes from past overlay releases. Each app's own release notes are the full
+record.
 
 ## Shared Comfylib foundation
 
@@ -185,3 +185,23 @@ Tidings 0.4.1 fixes publisher TLS and content-negotiation compatibility for full
 stories, including OpenAI pages, and reports specific fetch failures. TLS
 certificate checks and the public-network restriction remain enabled. No database
 migration is needed for this patch.
+
+## Upgrade notes from earlier releases
+
+Imvault 0.20.0 adds migrations 033 and 034 for private 30-day Trash and
+camera-date browsing. Back up with the installed binary before upgrading; an
+older binary needs its matching pre-upgrade database. Owner API deletion moves
+files to Trash, which counts against quota until permanent deletion. See the
+[Imvault 0.20.0 release notes](https://github.com/airencracken/imvault/blob/v0.25.0/docs/release-notes/0.20.0.md).
+
+Witmoot schema upgrades cannot be undone, so back up the stopped data directory
+first. The [September 2026 audit](AUDIT-2026-09-29.md) describes the fixes in
+Imvault 0.10.1 and Witmoot 0.7.3.
+
+Folkweave 0.1.1 and Tidings 0.2.0 were the first packaged releases of those apps.
+
+Songstead builds its schema 11 search index at startup; allow time for large
+libraries. Shared sign-in adds an identity-binding table when enabled.
+
+The shared-maintenance releases moved to published Comfylib 0.3.0 and its
+separately versioned OIDC adapter 0.1.0.

@@ -6,7 +6,7 @@
 		<name>Marcus J. Hildum</name>
 	</maintainer>
 	<use>
-		<flag name="bubblewrap">Install Bubblewrap for optional whole-service isolation</flag>
+		<flag name="bubblewrap">Install Bubblewrap for optional service confinement</flag>
 	</use>
 	<upstream>
 		<remote-id type="github">airencracken/songstead</remote-id>
