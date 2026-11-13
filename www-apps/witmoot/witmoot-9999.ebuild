@@ -6,7 +6,7 @@ EAPI=8
 
 inherit git-r3 go-module systemd
 
-DESCRIPTION="A small, self-hosted bulletin board for friends and family"
+DESCRIPTION="Self-hosted bulletin board for friends and family"
 HOMEPAGE="https://github.com/airencracken/witmoot"
 EGIT_REPO_URI="https://github.com/airencracken/witmoot.git"
 EGIT_BRANCH="master"

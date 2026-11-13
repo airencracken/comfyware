@@ -151,6 +151,65 @@ class RecipeConventions(unittest.TestCase):
         self.assertNotEqual(live_equivalent(text.replace("fperms 0600", "fperms 0644"), "imvault"), live)
 
 
+ALL_APPS = ("imvault", "witmoot", "songstead", "folkweave", "tidings")
+
+
+def description_errors(text):
+    """Return DESCRIPTION problems, following the Gentoo devmanual's wording rules."""
+    match = re.search(r'^DESCRIPTION="([^"]*)"$', text, re.MULTILINE)
+    if not match:
+        return ["missing DESCRIPTION"]
+    description = match[1]
+    errors = []
+    if re.match(r"(?i)(a|an|the)\b", description):
+        errors.append("DESCRIPTION starts with an article")
+    if not description[:1].isupper():
+        errors.append("DESCRIPTION does not start with a capital letter")
+    if description.endswith("."):
+        errors.append("DESCRIPTION ends with a full stop")
+    if len(description) > 80:
+        errors.append("DESCRIPTION is longer than 80 characters")
+    if not description.startswith("Self-hosted "):
+        errors.append("DESCRIPTION does not follow the family wording")
+    return errors
+
+
+def current_recipes():
+    """Return each app's newest release recipe and its live recipe."""
+    found = []
+    for app in ALL_APPS:
+        found.append(release_recipes(app)[-1])
+        found.append(ROOT / "www-apps" / app / f"{app}-9999.ebuild")
+    return found
+
+
+class DescriptionConventions(unittest.TestCase):
+    def test_current_descriptions_are_consistent(self):
+        for recipe in current_recipes():
+            with self.subTest(recipe=recipe.name):
+                self.assertEqual(description_errors(recipe.read_text()), [])
+
+    def test_description_mutations_are_rejected(self):
+        text = release_recipes("witmoot")[-1].read_text()
+        original = re.search(r'^DESCRIPTION="([^"]*)"$', text, re.MULTILINE)[1]
+        mutations = {
+            "article": "A " + original[0].lower() + original[1:],
+            "capital": original[0].lower() + original[1:],
+            "full stop": original + ".",
+            "80 characters": original + " " + "x" * 80,
+            "family wording": "Bulletin board for friends and family",
+        }
+        for expected, description in mutations.items():
+            with self.subTest(mutation=expected):
+                mutated = text.replace(f'DESCRIPTION="{original}"', f'DESCRIPTION="{description}"')
+                self.assertNotEqual(mutated, text, "mutation did not apply")
+                self.assertTrue(any(expected in error for error in description_errors(mutated)))
+        self.assertEqual(description_errors(text.replace(f'DESCRIPTION="{original}"\n', "")), ["missing DESCRIPTION"])
+        for article in ("An", "The"):
+            mutated = text.replace(f'DESCRIPTION="{original}"', f'DESCRIPTION="{article} {original}"')
+            self.assertIn("DESCRIPTION starts with an article", description_errors(mutated))
+
+
 def readme_errors(readme, newest):
     """Return README claims that disagree with the newest release recipes."""
     errors = []

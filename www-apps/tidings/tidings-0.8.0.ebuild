@@ -5,7 +5,7 @@ EAPI=8
 
 inherit go-module systemd
 
-DESCRIPTION="A quiet self-hosted RSS and Atom reader"
+DESCRIPTION="Self-hosted RSS and Atom reader for friends and family"
 HOMEPAGE="https://github.com/airencracken/tidings"
 SRC_URI="
 	https://github.com/airencracken/tidings/releases/download/v${PV}/${PN}_${PV}_source.tar.gz

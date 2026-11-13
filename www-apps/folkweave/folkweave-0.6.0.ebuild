@@ -5,7 +5,7 @@ EAPI=8
 
 inherit go-module systemd
 
-DESCRIPTION="Private posts and photos for a small group"
+DESCRIPTION="Self-hosted private timeline for friends and family"
 HOMEPAGE="https://github.com/airencracken/folkweave"
 SRC_URI="
 	https://github.com/airencracken/folkweave/releases/download/v${PV}/${PN}_${PV}_source.tar.gz

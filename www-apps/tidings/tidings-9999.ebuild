@@ -6,7 +6,7 @@ EAPI=8
 
 inherit git-r3 go-module systemd
 
-DESCRIPTION="A quiet self-hosted RSS and Atom reader"
+DESCRIPTION="Self-hosted RSS and Atom reader for friends and family"
 HOMEPAGE="https://github.com/airencracken/tidings"
 EGIT_REPO_URI="https://github.com/airencracken/tidings.git"
 EGIT_BRANCH="master"

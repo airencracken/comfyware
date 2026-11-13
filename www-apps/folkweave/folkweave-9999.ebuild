@@ -6,7 +6,7 @@ EAPI=8
 
 inherit git-r3 go-module systemd
 
-DESCRIPTION="Private posts and photos for a small group"
+DESCRIPTION="Self-hosted private timeline for friends and family"
 HOMEPAGE="https://github.com/airencracken/folkweave"
 EGIT_REPO_URI="https://github.com/airencracken/folkweave.git"
 EGIT_BRANCH="master"

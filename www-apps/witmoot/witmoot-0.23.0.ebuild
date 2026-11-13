@@ -5,7 +5,7 @@ EAPI=8
 
 inherit go-module systemd
 
-DESCRIPTION="A small, self-hosted bulletin board for friends and family"
+DESCRIPTION="Self-hosted bulletin board for friends and family"
 HOMEPAGE="https://github.com/airencracken/witmoot"
 SRC_URI="
 	https://github.com/airencracken/witmoot/releases/download/v${PV}/${PN}_${PV}_source.tar.gz
