@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "releases": {
-    "folkweave": "0.7.1",
-    "imvault": "0.26.0",
-    "songstead": "0.17.0",
-    "tidings": "0.9.0",
-    "witmoot": "0.24.0",
-    "comfylib": "0.7.1",
+    "folkweave": "0.7.2",
+    "imvault": "0.26.1",
+    "songstead": "0.17.1",
+    "tidings": "0.9.1",
+    "witmoot": "0.24.1",
+    "comfylib": "0.7.2",
     "comfylib/oidc": "0.1.0",
     "arise": "0.0.42"
   }
