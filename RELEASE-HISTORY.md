@@ -3,6 +3,37 @@
 Notes from past overlay releases. Each app's own release notes are the full
 record.
 
+## Site health metrics, palettes and Comfylib 0.7.1
+
+Imvault 0.26.0, Witmoot 0.24.0, Songstead 0.17.0, Folkweave 0.7.1 and Tidings
+0.9.0 all pin the published
+[Comfylib v0.7.1](https://github.com/airencracken/comfylib/releases/tag/v0.7.1).
+Sizes are shown in binary units (MiB), and each app offers System, Light and
+Dark themes with colour palettes that owners can set for the site. None of the
+apps records who signs in or what anyone opens any more; admin metrics show site
+health and security counts instead, and the upgrade deletes the stored sign-in
+and view history.
+
+Each upgrade migrates the database and cannot be undone, so back up the stopped
+data directory first and keep that copy for a downgrade:
+
+- Imvault 0.26.0 adds migrations 035 and 036. File sharing becomes two
+  per-file switches for camera details and location; nothing becomes more
+  visible. New passwords need at least 12 characters; existing passwords keep
+  working. Pages now refuse inline scripts, so a proxy that injects them stops
+  working. Alpine.js is gone from the web assets; the package licenses are
+  unchanged.
+- Witmoot 0.24.0 adds migrations 021 and 022. The binary's own default address
+  is now `127.0.0.1:8082`. The packaged OpenRC service, `/etc/conf.d/witmoot`,
+  the systemd unit and `/etc/witmoot/witmoot.env` already set that address, so
+  packaged installs keep listening where they did.
+- Songstead 0.17.0 applies schema 12.
+- Tidings 0.9.0 applies schema 7, replacing topics with ordered tags and adding
+  **Skip**. New passwords need at least 12 characters.
+- Folkweave 0.7.1 includes the 0.7.0 changes, which this overlay skipped: new
+  site health tables and a site palette setting, and JSON error bodies from the
+  API. Photo uploads accept up to 5 MiB again.
+
 ## Shared Comfylib foundation
 
 Imvault 0.20.6, Witmoot 0.18.4 and Songstead 0.11.3 pin the published

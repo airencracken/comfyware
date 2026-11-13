@@ -5,11 +5,11 @@ and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.25.0` | [Imvault](https://github.com/airencracken/imvault): photos and short clips |
-| `www-apps/witmoot` | `0.23.0` | [Witmoot](https://github.com/airencracken/witmoot): a bulletin board |
-| `www-apps/songstead` | `0.16.0` | [Songstead](https://github.com/airencracken/songstead): music recommendations |
-| `www-apps/folkweave` | `0.6.0` | [Folkweave](https://github.com/airencracken/folkweave): a private group timeline |
-| `www-apps/tidings` | `0.8.0` | [Tidings](https://github.com/airencracken/tidings): an RSS and Atom reader |
+| `www-apps/imvault` | `0.26.0` | [Imvault](https://github.com/airencracken/imvault): photos and short clips |
+| `www-apps/witmoot` | `0.24.0` | [Witmoot](https://github.com/airencracken/witmoot): a bulletin board |
+| `www-apps/songstead` | `0.17.0` | [Songstead](https://github.com/airencracken/songstead): music recommendations |
+| `www-apps/folkweave` | `0.7.1` | [Folkweave](https://github.com/airencracken/folkweave): a private group timeline |
+| `www-apps/tidings` | `0.9.0` | [Tidings](https://github.com/airencracken/tidings): an RSS and Atom reader |
 
 Release ebuilds build the published source with a checksummed bundle of Go
 dependencies, so the build needs no network. Each app also has a live `9999`
@@ -68,9 +68,9 @@ Optional USE flags, in `/etc/portage/package.use/comfyware`:
 - `ffmpeg` on Imvault makes video thumbnails and enforces clip length.
 - `bubblewrap` on Imvault, Witmoot or Songstead installs a non-setuid launcher
   for service confinement. Turn it on in the service settings; see the
-  [Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/sandbox.md),
-  [Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/sandbox.md) or
-  [Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/sandbox.md)
+  [Imvault](https://github.com/airencracken/imvault/blob/v0.26.0/docs/sandbox.md),
+  [Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.0/docs/sandbox.md) or
+  [Songstead](https://github.com/airencracken/songstead/blob/v0.17.0/docs/sandbox.md)
   guide. Imvault's media sandbox also needs `ffmpeg`.
 - `zstd` is on by default and compresses backups. Without it, the apps use
   built-in gzip.
@@ -119,11 +119,11 @@ Keep OpenRC files at mode 0600, since they can hold mail passwords.
    with scripts.
 
 Each app's deployment guide has the details:
-[Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/deployment.md),
-[Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/deployment.md),
-[Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/deployment.md),
-[Folkweave](https://github.com/airencracken/folkweave/blob/v0.6.0/docs/deployment.md),
-[Tidings](https://github.com/airencracken/tidings/blob/v0.8.0/docs/deployment.md).
+[Imvault](https://github.com/airencracken/imvault/blob/v0.26.0/docs/deployment.md),
+[Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.0/docs/deployment.md),
+[Songstead](https://github.com/airencracken/songstead/blob/v0.17.0/docs/deployment.md),
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.7.1/docs/deployment.md),
+[Tidings](https://github.com/airencracken/tidings/blob/v0.9.0/docs/deployment.md).
 
 OpenRC logs go to `/var/log/APP.log` and logrotate rotates them; keep its cron
 job or timer on. Under systemd, logs go to the journal.
@@ -139,28 +139,28 @@ them off-host.
 To change the schedule, set `APP_BACKUP_INTERVAL` (0 turns it off),
 `APP_BACKUP_KEEP`, `APP_BACKUP_MAX_BYTES` or `APP_BACKUP_COPY_MAX_BYTES`, with
 `APP` as the app's name in capitals. Restore steps are in each guide:
-[Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/automatic-backups.md),
-[Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/automatic-backups.md),
-[Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/automatic-backups.md),
-[Folkweave](https://github.com/airencracken/folkweave/blob/v0.6.0/docs/automatic-backups.md),
-[Tidings](https://github.com/airencracken/tidings/blob/v0.8.0/docs/automatic-backups.md).
+[Imvault](https://github.com/airencracken/imvault/blob/v0.26.0/docs/automatic-backups.md),
+[Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.0/docs/automatic-backups.md),
+[Songstead](https://github.com/airencracken/songstead/blob/v0.17.0/docs/automatic-backups.md),
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.7.1/docs/automatic-backups.md),
+[Tidings](https://github.com/airencracken/tidings/blob/v0.9.0/docs/automatic-backups.md).
 
 Imvault can also write extra verified snapshots to another directory. Create
 `/var/backups/imvault` (mode 0700, owned by `imvault`), then enable
 `imvault-backup.timer` on systemd, or copy `examples/cron/imvault-backup` into
 `/etc/cron.d/` (mode 0644) on OpenRC. Neither is on by default. Both keep seven
 snapshots; change `--keep` for another count. See the
-[operations guide](https://github.com/airencracken/imvault/blob/v0.25.0/docs/operations.md).
+[operations guide](https://github.com/airencracken/imvault/blob/v0.26.0/docs/operations.md).
 
 ### Connect the apps
 
 The apps can link to each other and share a community sign-in. Both are off
 until you configure them, and accounts stay separate. See the suite guides for
-[Imvault](https://github.com/airencracken/imvault/blob/v0.25.0/docs/suite.md),
-[Witmoot](https://github.com/airencracken/witmoot/blob/v0.23.0/docs/suite.md),
-[Songstead](https://github.com/airencracken/songstead/blob/v0.16.0/docs/suite.md),
-[Folkweave](https://github.com/airencracken/folkweave/blob/v0.6.0/docs/suite.md) and
-[Tidings](https://github.com/airencracken/tidings/blob/v0.8.0/docs/suite.md).
+[Imvault](https://github.com/airencracken/imvault/blob/v0.26.0/docs/suite.md),
+[Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.0/docs/suite.md),
+[Songstead](https://github.com/airencracken/songstead/blob/v0.17.0/docs/suite.md),
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.7.1/docs/suite.md) and
+[Tidings](https://github.com/airencracken/tidings/blob/v0.9.0/docs/suite.md).
 
 ## Update
 
@@ -225,10 +225,10 @@ For a new version, verify the upstream source release, then build its
 dependency bundle:
 
 ```sh
-bash scripts/make-deps.sh imvault 0.25.0 imvault_0.25.0_source.tar.gz /tmp/comfyware-distfiles
+bash scripts/make-deps.sh imvault 0.26.0 imvault_0.26.0_source.tar.gz /tmp/comfyware-distfiles
 ```
 
-Publish the bundle under the matching tag (`imvault-0.25.0`) in this
+Publish the bundle under the matching tag (`imvault-0.26.0`) in this
 repository's GitHub Releases. Update the ebuild, run
 `ebuild path/to/package-version.ebuild manifest`, and build it with Portage.
 Never replace a published distfile.

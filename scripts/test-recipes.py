@@ -517,6 +517,13 @@ def write_fixture(source, app, bin_default):
                                           f"SyslogIdentifier={app}\nExecStart=/usr/local/bin/{app}{command}\n",
         f"contrib/systemd/{app}.env": f"# {upper}_ADDR=127.0.0.1:8080\n",
     }
+    if app == "witmoot":
+        # Upstream names the address in every service file; see test-install.sh.
+        files[f"contrib/openrc/{app}"] = (f'#!/sbin/openrc-run\n: "${{{upper}_BIN:={bin_default}}}"\n'
+                                          ': "${WITMOOT_ADDR:=127.0.0.1:8082}"\n'
+                                          f'command="${{{upper}_BIN}}"\n')
+        files[f"contrib/openrc/{app}.confd"] = '# Witmoot settings\nWITMOOT_ADDR="127.0.0.1:8082"\n'
+        files[f"contrib/systemd/{app}.env"] = '# Witmoot settings\nWITMOOT_ADDR="127.0.0.1:8082"\n'
     if app == "songstead":
         files["contrib/systemd/songstead-sandbox.conf"] = "[Service]\nExecStart=\nExecStart=/usr/local/bin/songstead sandbox\n"
     if app == "imvault":
@@ -567,6 +574,17 @@ class StagedInstallCheck(unittest.TestCase):
             "systemd executable": text.replace("contrib/systemd/witmoot.service > ",
                                                "contrib/systemd/witmoot.service | sed 's|/usr/bin|/opt|' > "),
             "logrotate": text.replace("\tapp-admin/logrotate\n\tapp-misc", "\tapp-misc"),
+            "OpenRC configuration does not set the Witmoot address": text.replace(
+                "\tnewconfd contrib/openrc/witmoot.confd witmoot\n",
+                "\tsed '/^WITMOOT_ADDR=/d' contrib/openrc/witmoot.confd > \"${T}/witmoot.confd\" || die\n"
+                "\tnewconfd \"${T}/witmoot.confd\" witmoot\n"),
+            "OpenRC service does not default the Witmoot address": text.replace(
+                "contrib/openrc/witmoot > \"${T}/witmoot.initd\"",
+                "contrib/openrc/witmoot | sed 's|127.0.0.1:8082||' > \"${T}/witmoot.initd\""),
+            "systemd environment file does not set the Witmoot address": text.replace(
+                "\tnewins contrib/systemd/witmoot.env witmoot.env\n",
+                "\tsed 's|127.0.0.1:8082|:8082|' contrib/systemd/witmoot.env > \"${T}/witmoot.env\" || die\n"
+                "\tnewins \"${T}/witmoot.env\" witmoot.env\n"),
         }
         for expected, mutated in mutations.items():
             with self.subTest(mutation=expected):
