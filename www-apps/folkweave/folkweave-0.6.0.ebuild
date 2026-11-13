@@ -70,15 +70,19 @@ src_install() {
 }
 
 pkg_postinst() {
+	if [[ -n ${REPLACING_VERSIONS} ]]; then
+		elog "Updated to ${PV}. What changed: https://github.com/airencracken/folkweave/releases/tag/v${PV}"
+		return
+	fi
+
 	elog "Browser setup: start the service, then run folkweave setup for its private key."
 	elog "Command-line owner: folkweave create-owner --username NAME"
 	elog "Password recovery: folkweave set-password --username NAME"
-	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
-	elog "Configure /etc/conf.d/folkweave or /etc/folkweave/folkweave.env and your HTTPS proxy."
-	elog "Native defaults: 127.0.0.1:8084 and /var/lib/folkweave."
-	elog "Installed administrative commands invoked as root use the service account."
-	elog "Read /usr/share/doc/${PF}/docs/ for installation, backups and recovery."
-	elog "The service creates verified compressed backups daily; copy them off-host."
-	elog "Back up before upgrading; restore a pre-upgrade snapshot to roll back."
+	elog "Configure /etc/conf.d/folkweave (OpenRC) or /etc/folkweave/folkweave.env (systemd)."
+	elog "The service listens on 127.0.0.1:8084 and keeps data in /var/lib/folkweave."
+	elog "Put an HTTPS reverse proxy in front before inviting people."
+	elog "Automatic backups are built in: the service makes one daily and keeps seven."
+	elog "Owners can check them in settings. Copy them off-host; see docs/automatic-backups.md."
+	elog "Guides: /usr/share/doc/${PF}/docs/ and"
 	elog "https://github.com/airencracken/folkweave/tree/v${PV}/docs"
 }

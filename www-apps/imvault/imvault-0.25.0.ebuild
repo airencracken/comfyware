@@ -119,19 +119,24 @@ pkg_preinst() {
 }
 
 pkg_postinst() {
+	if [[ -n ${REPLACING_VERSIONS} ]]; then
+		elog "Updated to ${PV}. What changed: https://github.com/airencracken/imvault/releases/tag/v${PV}"
+		return
+	fi
+
 	elog "Browser setup: start the service, then run imvault setup for its private key."
 	elog "Command-line owner: imvault create-owner --username NAME"
 	elog "Password recovery: imvault set-password --username NAME"
-	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
-	elog "The running service makes compressed backups daily, keeping at most seven copies."
-	elog "Automatic archives are capped at 10 GiB; an uncompressed snapshot is capped at 5 GiB."
-	elog "Owners can check success and failures in instance settings. Copy snapshots off-host."
-	elog "zstd is preferred when available; without it the built-in gzip compressor is used."
-	elog "See the installed docs/automatic-backups.md for caps, scheduling and recovery."
 	elog "Configure /etc/conf.d/imvault (OpenRC) or /etc/imvault/imvault.env (systemd)."
-	elog "Online verified backups can use the optional systemd timer or cron example."
-	elog "Neither scheduler is enabled automatically; see docs/operations.md."
-	elog "Bubblewrap confinement is optional; see docs/sandbox.md."
-	elog "Both guides are in /usr/share/doc/${PF}/docs/ and at"
+	elog "Set IMVAULT_ADDR to 127.0.0.1:8080 so only the proxy reaches it. Data: /var/lib/imvault."
+	elog "Put an HTTPS reverse proxy in front before inviting people."
+	elog "Automatic backups are built in: the service makes one daily and keeps seven."
+	elog "Check them in instance settings and copy them off-host; see docs/automatic-backups.md."
+	elog "Separately, imvault-backup.timer or examples/cron/imvault-backup can write extra"
+	elog "verified snapshots to /var/backups/imvault. Neither is enabled; see docs/operations.md."
+	elog "Guides: /usr/share/doc/${PF}/docs/ and"
 	elog "https://github.com/airencracken/imvault/tree/v${PV}/docs"
+	if use bubblewrap; then
+		elog "Bubblewrap confinement is optional; see docs/sandbox.md."
+	fi
 }

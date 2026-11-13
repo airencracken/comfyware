@@ -85,20 +85,22 @@ src_install() {
 }
 
 pkg_postinst() {
+	if [[ -n ${REPLACING_VERSIONS} ]]; then
+		elog "Updated to ${PV}. What changed: https://github.com/airencracken/witmoot/commits/master"
+		return
+	fi
+
 	elog "Browser setup: start the service, then run witmoot setup for its private key."
 	elog "Command-line owner: witmoot create-owner --username NAME"
 	elog "Password recovery: witmoot set-password --username NAME"
-	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
-	elog "The running service makes compressed backups daily, keeping at most seven copies."
-	elog "Automatic archives are capped at 10 GiB; an uncompressed snapshot is capped at 5 GiB."
-	elog "Owners can check success and failures in instance settings. Copy snapshots off-host."
-	elog "zstd is preferred when available; without it the built-in gzip compressor is used."
-	elog "See the installed docs/automatic-backups.md for caps, scheduling and recovery."
 	elog "Configure /etc/conf.d/witmoot (OpenRC) or /etc/witmoot/witmoot.env (systemd)."
-	elog "The native service listens on 127.0.0.1:8082 and uses /var/lib/witmoot."
-	elog "Bubblewrap confinement is optional; see docs/sandbox.md."
-	elog "Both guides are in /usr/share/doc/${PF}/docs/ and at"
+	elog "The service listens on 127.0.0.1:8082 and keeps data in /var/lib/witmoot."
+	elog "Put an HTTPS reverse proxy in front before inviting people."
+	elog "Automatic backups are built in: the service makes one daily and keeps seven."
+	elog "Check them in instance settings and copy them off-host; see docs/automatic-backups.md."
+	elog "Guides: /usr/share/doc/${PF}/docs/ and"
 	elog "https://github.com/airencracken/witmoot/tree/master/docs"
-	elog "Ordinary CLI commands refuse outdated schemas; stop the service before witmoot migrate."
-	elog "Back up the full data directory before upgrades; schema upgrades prevent downgrades."
+	if use bubblewrap; then
+		elog "Bubblewrap confinement is optional; see docs/sandbox.md."
+	fi
 }

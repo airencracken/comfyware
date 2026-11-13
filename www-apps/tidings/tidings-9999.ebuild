@@ -74,15 +74,19 @@ src_install() {
 }
 
 pkg_postinst() {
+	if [[ -n ${REPLACING_VERSIONS} ]]; then
+		elog "Updated to ${PV}. What changed: https://github.com/airencracken/tidings/commits/master"
+		return
+	fi
+
 	elog "Browser setup: start the service, then run tidings setup for its private key."
 	elog "Command-line owner: tidings create-owner --username NAME"
 	elog "Password recovery: tidings set-password --username NAME"
-	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
-	elog "Configure /etc/conf.d/tidings or /etc/tidings/tidings.env and your HTTPS proxy."
-	elog "Native defaults: 127.0.0.1:8085 and /var/lib/tidings."
-	elog "Installed administrative commands invoked as root use the service account."
-	elog "Read /usr/share/doc/${PF}/docs/ for installation, backups and recovery."
-	elog "The service creates verified compressed backups daily; copy them off-host."
-	elog "Back up before upgrading; restore a pre-upgrade snapshot to roll back."
+	elog "Configure /etc/conf.d/tidings (OpenRC) or /etc/tidings/tidings.env (systemd)."
+	elog "The service listens on 127.0.0.1:8085 and keeps data in /var/lib/tidings."
+	elog "Put an HTTPS reverse proxy in front before inviting people."
+	elog "Automatic backups are built in: the service makes one daily and keeps seven."
+	elog "Owners can check them in settings. Copy them off-host; see docs/automatic-backups.md."
+	elog "Guides: /usr/share/doc/${PF}/docs/ and"
 	elog "https://github.com/airencracken/tidings/tree/master/docs"
 }

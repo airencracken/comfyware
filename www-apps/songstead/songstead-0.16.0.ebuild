@@ -84,27 +84,22 @@ src_install() {
 }
 
 pkg_postinst() {
+	if [[ -n ${REPLACING_VERSIONS} ]]; then
+		elog "Updated to ${PV}. What changed: https://github.com/airencracken/songstead/releases/tag/v${PV}"
+		return
+	fi
+
 	elog "Browser setup: start the service, then run songstead setup for its private key."
 	elog "Command-line owner: songstead create-owner --username NAME"
 	elog "Password recovery: songstead set-password --username NAME"
-	elog "Account commands prompt privately; --password-stdin and --password-file support automation."
-	elog "The running service makes compressed backups daily, keeping at most seven copies."
-	elog "Automatic archives are capped at 10 GiB; an uncompressed snapshot is capped at 5 GiB."
-	elog "Owners can check success and failures in instance settings. Copy snapshots off-host."
-	elog "zstd is preferred when available; without it the built-in gzip compressor is used."
-	elog "See the installed docs/automatic-backups.md for caps, scheduling and recovery."
 	elog "Configure /etc/conf.d/songstead (OpenRC) or /etc/songstead/songstead.env (systemd)."
-	elog "The native service listens on 127.0.0.1:8083 and uses /var/lib/songstead."
-	elog "Account commands discover service settings and use the service account when invoked as root."
-	elog "On upgrades, restart the updated service before running account commands."
-	elog "For an existing member: songstead set-role --username NAME --role owner"
-	elog "Sign in as an owner and open Admin to configure Witmoot, invite people, and manage accounts."
-	elog "Open Your settings for profile, spoiler and discovery preferences; Recent offers List and Tiles."
-	elog "Owners choose Songstead, Witmoot or Both discussion locations in Admin; Witmoot needs separate accounts. No API key is needed."
-	elog "Senders can add genre and tags; supported provider artwork is cached locally."
-	elog "Both guides are in /usr/share/doc/${PF}/docs/ and at"
+	elog "The service listens on 127.0.0.1:8083 and keeps data in /var/lib/songstead."
+	elog "Put an HTTPS reverse proxy in front before inviting people."
+	elog "Automatic backups are built in: the service makes one daily and keeps seven."
+	elog "Check them in instance settings and copy them off-host; see docs/automatic-backups.md."
+	elog "Guides: /usr/share/doc/${PF}/docs/ and"
 	elog "https://github.com/airencracken/songstead/tree/v${PV}/docs"
-	elog "Bubblewrap confinement is optional; see docs/sandbox.md and the packaged systemd drop-in."
-	elog "Startup applies migrations; back up the data directory before starting a new binary."
-	elog "Back up the full data directory before upgrades; schema upgrades prevent downgrades."
+	if use bubblewrap; then
+		elog "Bubblewrap confinement is optional; see docs/sandbox.md and the packaged systemd drop-in."
+	fi
 }

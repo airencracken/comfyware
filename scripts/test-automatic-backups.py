@@ -16,7 +16,9 @@ def errors(text):
         problems.append("zstd is not enabled by default")
     if "zstd? ( app-arch/zstd )" not in text:
         problems.append("optional zstd dependency missing")
-    for phrase in ("seven copies", "10 GiB", "5 GiB", "instance settings", "off-host", "gzip", "docs/automatic-backups.md"):
+    # Caps and compression details live in the README and upstream guide; the
+    # install message points there.
+    for phrase in ("keeps seven", "instance settings", "off-host", "docs/automatic-backups.md"):
         if phrase not in text:
             problems.append("missing backup instruction: " + phrase)
     return problems
@@ -32,7 +34,7 @@ class AutomaticBackupTests(unittest.TestCase):
 
     def test_removing_dependency_or_policy_is_detected(self):
         text = (ROOT / "www-apps/songstead" / f"songstead-{VERSIONS['songstead']}.ebuild").read_text()
-        for before, after in (("+zstd", "zstd"), ("zstd? ( app-arch/zstd )", ""), ("seven copies", "unlimited copies"), ("10 GiB", "unlimited bytes"), ("off-host", "locally")):
+        for before, after in (("+zstd", "zstd"), ("zstd? ( app-arch/zstd )", ""), ("keeps seven", "keeps everything"), ("instance settings", "logs"), ("off-host", "locally")):
             with self.subTest(before=before):
                 self.assertNotEqual(text, text.replace(before, after))
                 self.assertTrue(errors(text.replace(before, after)))

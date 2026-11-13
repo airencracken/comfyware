@@ -66,6 +66,7 @@ def live_equivalent(release_text, app):
         "src_unpack() {\n\tgit-r3_src_unpack\n"
         "\t# Vendor the modules from go.mod so the build itself needs no network.\n"
         "\tgo-module_live_vendor\n}\n\nsrc_configure() {", 1)
+    text = text.replace("/releases/tag/v${PV}", "/commits/master")
     return text.replace("/tree/v${PV}/docs", "/tree/master/docs")
 
 
@@ -208,6 +209,90 @@ class DescriptionConventions(unittest.TestCase):
         for article in ("An", "The"):
             mutated = text.replace(f'DESCRIPTION="{original}"', f'DESCRIPTION="{article} {original}"')
             self.assertIn("DESCRIPTION starts with an article", description_errors(mutated))
+
+
+def postinst_messages(text, replacing="", flags=()):
+    """Run a recipe's pkg_postinst and return the lines it logs."""
+    function = re.search(r"^pkg_postinst\(\) \{\n.*?^\}\n", text, re.MULTILINE | re.DOTALL)
+    if not function:
+        raise AssertionError("the recipe has no pkg_postinst")
+    script = "\n".join([
+        "elog() { printf '%s\\n' \"$*\"; }",
+        "ewarn() { printf '%s\\n' \"$*\"; }",
+        "einfo() { printf '%s\\n' \"$*\"; }",
+        'use() { case " $USE_FLAGS " in *" $1 "*) return 0 ;; esac; return 1; }',
+        "PV=1.2.3 PF=app-1.2.3",
+        f"REPLACING_VERSIONS='{replacing}'",
+        f"USE_FLAGS='{' '.join(flags)}'",
+        function[0],
+        "pkg_postinst || exit 1",
+    ])
+    result = subprocess.run(["bash", "-c", script], capture_output=True, text=True, timeout=30)
+    if result.returncode != 0:
+        raise AssertionError(result.stderr or "pkg_postinst failed")
+    return result.stdout.splitlines()
+
+
+def postinst_errors(text, app):
+    """Return problems with the first-install and upgrade messages."""
+    errors = []
+    first = postinst_messages(text)
+    full = postinst_messages(text, flags=("bubblewrap",))
+    upgrade = postinst_messages(text, replacing="1.2.2", flags=("bubblewrap",))
+    if len(full) > 14:
+        errors.append(f"first-install message has {len(full)} lines, more than 14")
+    for phrase in (f"{app} setup", f"{app} create-owner", f"{app} set-password",
+                   f"/etc/conf.d/{app}", "off-host", "docs/automatic-backups.md"):
+        if not any(phrase in line for line in first):
+            errors.append(f"first-install message does not mention {phrase}")
+    if len(upgrade) != 1 or f"github.com/airencracken/{app}/" not in upgrade[0]:
+        errors.append("upgrade message is not one line pointing at the changes")
+    if any(len(line) > 100 for line in full):
+        errors.append("message line longer than 100 characters")
+    return errors
+
+
+class InstallMessages(unittest.TestCase):
+    def test_current_messages_are_concise(self):
+        for recipe in current_recipes():
+            app = recipe.parent.name
+            with self.subTest(recipe=recipe.name):
+                self.assertEqual(postinst_errors(recipe.read_text(), app), [])
+
+    def test_upgrades_point_at_the_matching_changes(self):
+        for recipe in current_recipes():
+            app = recipe.parent.name
+            want = "/commits/master" if recipe.name.endswith("-9999.ebuild") else "/releases/tag/v1.2.3"
+            with self.subTest(recipe=recipe.name):
+                self.assertTrue(postinst_messages(recipe.read_text(), replacing="1.2.2")[0].endswith(app + want))
+
+    def test_imvault_separates_built_in_and_optional_backups(self):
+        text = "\n".join(postinst_messages(release_recipes("imvault")[-1].read_text()))
+        self.assertIn("Automatic backups are built in", text)
+        self.assertIn("Neither is enabled", text)
+        self.assertLess(text.index("built in"), text.index("imvault-backup.timer"))
+
+    def test_bubblewrap_note_follows_the_use_flag(self):
+        text = release_recipes("witmoot")[-1].read_text()
+        self.assertFalse(any("Bubblewrap" in line for line in postinst_messages(text)))
+        self.assertTrue(any("Bubblewrap" in line for line in postinst_messages(text, flags=("bubblewrap",))))
+
+    def test_message_mutations_are_rejected(self):
+        text = release_recipes("songstead")[-1].read_text()
+        mutations = {
+            "upgrade message": text.replace("\t\treturn\n", "", 1),
+            "more than 14": text.replace('\telog "Guides:', '\telog "x"\n' * 10 + '\telog "Guides:', 1),
+            "off-host": text.replace("off-host", "elsewhere"),
+            "longer than 100": text.replace("Command-line owner:", "Command-line owner:" + " " * 100),
+        }
+        for expected, mutated in mutations.items():
+            with self.subTest(mutation=expected):
+                self.assertNotEqual(mutated, text, "mutation did not apply")
+                self.assertTrue(any(expected in error for error in postinst_errors(mutated, "songstead")))
+        with self.assertRaises(AssertionError):
+            postinst_messages(text.replace("pkg_postinst() {", "pkg_other() {"))
+        hostile = postinst_messages(text, replacing="$(touch /nonexistent/x); 1.0")
+        self.assertEqual(len(hostile), 1)
 
 
 def readme_errors(readme, newest):

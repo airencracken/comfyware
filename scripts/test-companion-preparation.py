@@ -11,9 +11,14 @@ spec = importlib.util.spec_from_file_location("recipes", ROOT / "scripts/test-re
 recipes = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(recipes)
 
+def newest(app):
+    """Return the newest published release, which the live recipe tracks."""
+    return recipes.release_recipes(app)[-1].stem.removeprefix(app + "-")
+
+
 class CompanionPreparation(unittest.TestCase):
     def test_recipes_match_live_services_and_compile_versions(self):
-        for app, version in (("witmoot", "0.22.0"), ("imvault", "0.24.0")):
+        for app, version in (("witmoot", newest("witmoot")), ("imvault", newest("imvault"))):
             with self.subTest(app=app):
                 staged = ROOT / "release-preparation" / f"{app}-{version}.ebuild"
                 active = ROOT / "www-apps" / app / staged.name
