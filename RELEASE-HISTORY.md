@@ -3,6 +3,20 @@
 Notes from past overlay releases. Each app's own release notes are the full
 record.
 
+## Reading data, account exports, and browse controls
+
+Imvault 0.26.2, Witmoot 0.24.2, Songstead 0.17.3, Folkweave 0.7.3 and
+Tidings 0.9.3 pin Comfylib 0.7.3. Its Go consumer validator checks the
+shared dependency, and the maintenance tools preserve writable module caches.
+
+- Tidings preserves restored full-text article copies when a feed refreshes.
+  Large reading-data downloads contain separate, importable JSON files.
+- Folkweave completes account archives before offering the download.
+- Songstead preserves browse context and groups filters and display options.
+- Witmoot's release checks run the Imvault integration in a real browser.
+
+These patches add no database migrations.
+
 ## Palette typography and privacy fixes
 
 Imvault 0.26.1, Witmoot 0.24.1, Songstead 0.17.1, Folkweave 0.7.2 and Tidings
