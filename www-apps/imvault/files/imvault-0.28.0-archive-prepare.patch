@@ -1,0 +1,17 @@
+Check module pins when the release preparation test runs from a source archive.
+
+--- a/scripts/release/prepare.sh
++++ b/scripts/release/prepare.sh
+@@ -2,7 +2,11 @@
+ # SPDX-License-Identifier: AGPL-3.0-or-later
+ cd "$(dirname "$0")/../.." || exit 1
+ export GOWORK=off
++modules=$(sha256sum go.mod go.sum) || exit 1
+ go mod download || exit 1
+ go mod verify || exit 1
+-git diff --exit-code -- go.mod go.sum || exit 1
++printf '%s\n' "$modules" | sha256sum --check --status || exit 1
++if git ls-files --error-unmatch -- go.mod go.sum >/dev/null 2>&1; then
++    git diff --exit-code -- go.mod go.sum || exit 1
++fi
+ exec python3 scripts/comfy.py prepare-release "$@"

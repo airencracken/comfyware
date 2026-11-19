@@ -55,6 +55,7 @@ def live_equivalent(release_text, app):
     text = release_text.replace(
         "# SPDX-License-Identifier: AGPL-3.0-or-later\n",
         "# SPDX-License-Identifier: AGPL-3.0-or-later\n# Live ebuild for the master branch.\n", 1)
+    text = text.replace('PATCHES=( "${FILESDIR}/${P}-archive-prepare.patch" )\n\n', "")
     text = text.replace("inherit go-module systemd", "inherit git-r3 go-module systemd", 1)
     text = re.sub(r'SRC_URI="\n.*?"\nS="\$\{WORKDIR\}/\$\{PN\}_\$\{PV\}_source"\n',
                   f'EGIT_REPO_URI="https://github.com/airencracken/{app}.git"\nEGIT_BRANCH="master"\n',
@@ -150,6 +151,52 @@ class RecipeConventions(unittest.TestCase):
         text = release_recipes("imvault")[-1].read_text()
         live = live_equivalent(text, "imvault")
         self.assertNotEqual(live_equivalent(text.replace("fperms 0600", "fperms 0644"), "imvault"), live)
+
+    def test_imvault_release_preparation_accepts_archives_and_rejects_changed_pins(self):
+        package = ROOT / "www-apps" / "imvault"
+        self.assertIn('PATCHES=( "${FILESDIR}/${P}-archive-prepare.patch" )',
+                      (package / "imvault-0.28.0.ebuild").read_text())
+        patch = package / "files" / "imvault-0.28.0-archive-prepare.patch"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            script = root / "scripts" / "release" / "prepare.sh"
+            script.parent.mkdir(parents=True)
+            script.write_text(
+                '#!/bin/sh\n# SPDX-License-Identifier: AGPL-3.0-or-later\n'
+                'cd "$(dirname "$0")/../.." || exit 1\nexport GOWORK=off\n'
+                'go mod download || exit 1\ngo mod verify || exit 1\n'
+                'git diff --exit-code -- go.mod go.sum || exit 1\n'
+                'exec python3 scripts/comfy.py prepare-release "$@"\n')
+            (root / "scripts" / "comfy.py").write_text(
+                "from pathlib import Path\nPath('prepared').touch()\n")
+            (root / "go.mod").write_text("module imvault\n")
+            (root / "go.sum").write_text("original checksum\n")
+            go = root / "go"
+            go.write_text('#!/bin/sh\nif [ "$2" = download ] && [ "$CHANGE_PIN" = yes ]; then\n'
+                          '    printf "modified checksum\\n" > go.sum || exit 1\nfi\nexit 0\n')
+            go.chmod(0o755)
+            subprocess.run(["patch", "--batch", "-p1", "-i", patch],
+                           cwd=root, check=True, capture_output=True)
+            env = dict(os.environ, PATH=f"{root}:{os.environ['PATH']}",
+                       GIT_CEILING_DIRECTORIES=str(root.parent))
+            subprocess.run(["sh", script], cwd=root, env=dict(env, CHANGE_PIN="no"),
+                           check=True, capture_output=True)
+            result = root / "prepared"
+            self.assertTrue(result.exists())
+            result.unlink()
+            changed = subprocess.run(["sh", script], cwd=root, env=dict(env, CHANGE_PIN="yes"),
+                                     capture_output=True)
+            self.assertNotEqual(changed.returncode, 0)
+            self.assertFalse(result.exists())
+            pins = root / "go.sum"
+            pins.write_text("original checksum\n")
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "add", "go.mod", "go.sum"], cwd=root, check=True, capture_output=True)
+            pins.write_text("uncommitted checksum\n")
+            dirty = subprocess.run(["sh", script], cwd=root, env=dict(env, CHANGE_PIN="no"),
+                                   capture_output=True)
+            self.assertNotEqual(dirty.returncode, 0)
+            self.assertFalse(result.exists())
 
 
 ALL_APPS = ("imvault", "witmoot", "songstead", "folkweave", "tidings")

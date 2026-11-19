@@ -5,7 +5,7 @@ and small communities.
 
 | Package | Release | What it does |
 | --- | --- | --- |
-| `www-apps/imvault` | `0.26.2` | [Imvault](https://github.com/airencracken/imvault): photos and short clips |
+| `www-apps/imvault` | `0.28.0` | [Imvault](https://github.com/airencracken/imvault): photos and short clips |
 | `www-apps/witmoot` | `0.24.2` | [Witmoot](https://github.com/airencracken/witmoot): a bulletin board |
 | `www-apps/songstead` | `0.17.3` | [Songstead](https://github.com/airencracken/songstead): music recommendations |
 | `www-apps/folkweave` | `0.9.0` | [Folkweave](https://github.com/airencracken/folkweave): a private group timeline |
@@ -68,7 +68,7 @@ Optional USE flags, in `/etc/portage/package.use/comfyware`:
 - `ffmpeg` on Imvault makes video thumbnails and enforces clip length.
 - `bubblewrap` on Imvault, Witmoot or Songstead installs a non-setuid launcher
   for service confinement. Turn it on in the service settings; see the
-  [Imvault](https://github.com/airencracken/imvault/blob/v0.26.2/docs/sandbox.md),
+  [Imvault](https://github.com/airencracken/imvault/blob/v0.28.0/docs/sandbox.md),
   [Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.2/docs/sandbox.md) or
   [Songstead](https://github.com/airencracken/songstead/blob/v0.17.3/docs/sandbox.md)
   guide. Imvault's media sandbox also needs `ffmpeg`.
@@ -119,7 +119,7 @@ Keep OpenRC files at mode 0600, since they can hold mail passwords.
    with scripts.
 
 Each app's deployment guide has the details:
-[Imvault](https://github.com/airencracken/imvault/blob/v0.26.2/docs/deployment.md),
+[Imvault](https://github.com/airencracken/imvault/blob/v0.28.0/docs/deployment.md),
 [Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.2/docs/deployment.md),
 [Songstead](https://github.com/airencracken/songstead/blob/v0.17.3/docs/deployment.md),
 [Folkweave](https://github.com/airencracken/folkweave/blob/v0.9.0/docs/deployment.md),
@@ -139,7 +139,7 @@ them off-host.
 To change the schedule, set `APP_BACKUP_INTERVAL` (0 turns it off),
 `APP_BACKUP_KEEP`, `APP_BACKUP_MAX_BYTES` or `APP_BACKUP_COPY_MAX_BYTES`, with
 `APP` as the app's name in capitals. Restore steps are in each guide:
-[Imvault](https://github.com/airencracken/imvault/blob/v0.26.2/docs/automatic-backups.md),
+[Imvault](https://github.com/airencracken/imvault/blob/v0.28.0/docs/automatic-backups.md),
 [Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.2/docs/automatic-backups.md),
 [Songstead](https://github.com/airencracken/songstead/blob/v0.17.3/docs/automatic-backups.md),
 [Folkweave](https://github.com/airencracken/folkweave/blob/v0.9.0/docs/automatic-backups.md),
@@ -150,13 +150,13 @@ Imvault can also write extra verified snapshots to another directory. Create
 `imvault-backup.timer` on systemd, or copy `examples/cron/imvault-backup` into
 `/etc/cron.d/` (mode 0644) on OpenRC. Neither is on by default. Both keep seven
 snapshots; change `--keep` for another count. See the
-[operations guide](https://github.com/airencracken/imvault/blob/v0.26.2/docs/operations.md).
+[operations guide](https://github.com/airencracken/imvault/blob/v0.28.0/docs/operations.md).
 
 ### Connect the apps
 
 The apps can link to each other and share a community sign-in. Both are off
 until you configure them, and accounts stay separate. See the suite guides for
-[Imvault](https://github.com/airencracken/imvault/blob/v0.26.2/docs/suite.md),
+[Imvault](https://github.com/airencracken/imvault/blob/v0.28.0/docs/suite.md),
 [Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.2/docs/suite.md),
 [Songstead](https://github.com/airencracken/songstead/blob/v0.17.3/docs/suite.md),
 [Folkweave](https://github.com/airencracken/folkweave/blob/v0.9.0/docs/suite.md) and
