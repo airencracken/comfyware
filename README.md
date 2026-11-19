@@ -8,7 +8,7 @@ and small communities.
 | `www-apps/imvault` | `0.26.2` | [Imvault](https://github.com/airencracken/imvault): photos and short clips |
 | `www-apps/witmoot` | `0.24.2` | [Witmoot](https://github.com/airencracken/witmoot): a bulletin board |
 | `www-apps/songstead` | `0.17.3` | [Songstead](https://github.com/airencracken/songstead): music recommendations |
-| `www-apps/folkweave` | `0.7.3` | [Folkweave](https://github.com/airencracken/folkweave): a private group timeline |
+| `www-apps/folkweave` | `0.9.0` | [Folkweave](https://github.com/airencracken/folkweave): a private group timeline |
 | `www-apps/tidings` | `0.9.3` | [Tidings](https://github.com/airencracken/tidings): an RSS and Atom reader |
 
 Release ebuilds build the published source with a checksummed bundle of Go
@@ -122,7 +122,7 @@ Each app's deployment guide has the details:
 [Imvault](https://github.com/airencracken/imvault/blob/v0.26.2/docs/deployment.md),
 [Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.2/docs/deployment.md),
 [Songstead](https://github.com/airencracken/songstead/blob/v0.17.3/docs/deployment.md),
-[Folkweave](https://github.com/airencracken/folkweave/blob/v0.7.3/docs/deployment.md),
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.9.0/docs/deployment.md),
 [Tidings](https://github.com/airencracken/tidings/blob/v0.9.3/docs/deployment.md).
 
 OpenRC logs go to `/var/log/APP.log` and logrotate rotates them; keep its cron
@@ -142,7 +142,7 @@ To change the schedule, set `APP_BACKUP_INTERVAL` (0 turns it off),
 [Imvault](https://github.com/airencracken/imvault/blob/v0.26.2/docs/automatic-backups.md),
 [Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.2/docs/automatic-backups.md),
 [Songstead](https://github.com/airencracken/songstead/blob/v0.17.3/docs/automatic-backups.md),
-[Folkweave](https://github.com/airencracken/folkweave/blob/v0.7.3/docs/automatic-backups.md),
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.9.0/docs/automatic-backups.md),
 [Tidings](https://github.com/airencracken/tidings/blob/v0.9.3/docs/automatic-backups.md).
 
 Imvault can also write extra verified snapshots to another directory. Create
@@ -159,7 +159,7 @@ until you configure them, and accounts stay separate. See the suite guides for
 [Imvault](https://github.com/airencracken/imvault/blob/v0.26.2/docs/suite.md),
 [Witmoot](https://github.com/airencracken/witmoot/blob/v0.24.2/docs/suite.md),
 [Songstead](https://github.com/airencracken/songstead/blob/v0.17.3/docs/suite.md),
-[Folkweave](https://github.com/airencracken/folkweave/blob/v0.7.3/docs/suite.md) and
+[Folkweave](https://github.com/airencracken/folkweave/blob/v0.9.0/docs/suite.md) and
 [Tidings](https://github.com/airencracken/tidings/blob/v0.9.3/docs/suite.md).
 
 ## Update
