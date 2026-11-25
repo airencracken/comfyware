@@ -8,7 +8,7 @@ and small communities.
 | `www-apps/imvault` | `0.28.0` | [Imvault](https://github.com/airencracken/imvault): photos and short clips |
 | `www-apps/witmoot` | `0.24.2` | [Witmoot](https://github.com/airencracken/witmoot): a bulletin board |
 | `www-apps/songstead` | `0.17.3` | [Songstead](https://github.com/airencracken/songstead): music recommendations |
-| `www-apps/folkweave` | `0.9.0` | [Folkweave](https://github.com/airencracken/folkweave): a private group timeline |
+| `www-apps/folkweave` | `0.11.0` | [Folkweave](https://github.com/airencracken/folkweave): a private group timeline |
 | `www-apps/tidings` | `0.11.0` | [Tidings](https://github.com/airencracken/tidings): an RSS and Atom reader |
 
 Release ebuilds build the published source with a checksummed bundle of Go
