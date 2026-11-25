@@ -2,12 +2,37 @@
 """Initial-app release/live, service-account, build and documentation contracts."""
 from pathlib import Path
 import importlib.util
+import subprocess
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('recipes',ROOT/'scripts/test-recipes.py')
 recipes=importlib.util.module_from_spec(spec);spec.loader.exec_module(recipes)
 
 class InitialAppTests(unittest.TestCase):
+    def test_current_recipes_expand_to_versioned_release_archives(self):
+        script = """
+inherit() { :; }
+PN=$2
+PV=$3
+P=$PN-$PV
+WORKDIR=/work
+source "$1" || exit 1
+printf '%s\n%s\n' "$SRC_URI" "$S"
+"""
+        for app in ("folkweave", "tidings"):
+            recipe = recipes.release_recipes(app)[-1]
+            version = recipe.stem.removeprefix(app + "-")
+            with self.subTest(recipe=recipe.name):
+                files = subprocess.check_output(
+                    ["bash", "-c", script, "inspect-recipe", str(recipe), app, version],
+                    text=True,
+                ).split()
+                self.assertEqual(files, [
+                    f"https://github.com/airencracken/{app}/releases/download/v{version}/{app}_{version}_source.tar.gz",
+                    f"https://github.com/airencracken/comfyware/releases/download/{app}-{version}/{app}-{version}-deps.tar.xz",
+                    f"/work/{app}_{version}_source",
+                ])
+
     def test_native_recipes_match_and_stamp_versions(self):
         for app in ('folkweave','tidings'):
             # Compare the live recipe with the newest release, which it tracks.
